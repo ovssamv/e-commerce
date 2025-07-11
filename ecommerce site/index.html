@@ -1,0 +1,2452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HBM STORE </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #22223b;
+            --secondary: #4a4e69;
+            --accent: #9a8c98;
+            --light: #f2e9e4;
+            --success: #38b000;
+            --danger: #d90429;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: var(--light);
+            color: var(--primary);
+            padding-bottom: 120px;
+        }
+        header {
+            background: var(--primary);
+            color: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 1.5rem;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            margin-right: 10px;
+        }
+        nav {
+            display: flex;
+            gap: 1.5rem;
+        }
+        nav a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        nav a:hover {
+            color: var(--accent);
+        }
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: var(--light);
+            border-radius: 20px;
+            padding: 0.2rem 0.8rem;
+            margin-left: 1rem;
+        }
+        .search-bar input {
+            border: none;
+            outline: none;
+            background: transparent;
+            padding: 0.5rem;
+            font-size: 1rem;
+        }
+        .search-bar button {
+            background: var(--accent);
+            border: none;
+            color: var(--light);
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            margin-left: 0.3rem;
+        }
+        .user-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        .user-actions button {
+            background: var(--accent);
+            color: var(--light);
+            border: none;
+            border-radius: 20px;
+            padding: 0.4rem 1rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .user-actions button:hover {
+            background: var(--secondary);
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 2rem auto;
+            max-width: 1200px;
+            gap: 2rem;
+        }
+        .sidebar {
+            min-width: 180px;
+            background: var(--secondary);
+            color: var(--light);
+            border-radius: 12px;
+            padding: 1.5rem 1rem;
+            height: fit-content;
+        }
+        .sidebar h3 {
+            margin-top: 0;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar li {
+            margin: 1rem 0;
+        }
+        .sidebar a {
+            color: var(--light);
+            text-decoration: none;
+            font-size: 1rem;
+            transition: color 0.2s;
+        }
+        .sidebar a.active, .sidebar a:hover {
+            color: var(--accent);
+            font-weight: bold;
+        }
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+        .product-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(34,34,59,0.07);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        .product-card img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 0.7rem;
+        }
+        .product-card h4 {
+            margin: 0.3rem 0 0.2rem 0;
+            font-size: 1.1rem;
+        }
+        .product-card .price {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.2rem;
+        }
+        .product-card .old-price {
+            text-decoration: line-through;
+            color: #888;
+            font-size: 0.95rem;
+            margin-left: 0.5rem;
+        }
+        .product-card .discount {
+            background: var(--success);
+            color: #fff;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            padding: 0.1rem 0.5rem;
+            margin-left: 0.5rem;
+        }
+        .product-card button {
+            background: var(--accent);
+            color: var(--light);
+            border: none;
+            border-radius: 20px;
+            padding: 0.4rem 1rem;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 0.5rem;
+            transition: background 0.2s;
+        }
+        .product-card button:hover {
+            background: var(--secondary);
+        }
+        .admin-panel, .shopping-hall, .auth-modal,         .order-modal, .product-detail-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(34,34,59,0.12);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .admin-panel.active, .shopping-hall.active, .auth-modal.active, .order-modal.active, .product-detail-modal.active {
+            display: flex;
+        }
+        
+        .product-detail-content {
+            background: #fff;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 95vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+        
+        .product-images {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100px;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .product-main-image {
+            width: 280px;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+        
+        .product-thumbnails {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            max-height: 180px;
+            overflow-y: auto;
+            padding-right: 0.3rem;
+        }
+        
+        .product-thumbnails::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .product-thumbnails::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 2px;
+        }
+        
+        .product-thumbnails::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 2px;
+        }
+        
+        .product-thumbnails::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+        
+        .product-thumbnail {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .product-thumbnail.active {
+            border-color: var(--accent);
+        }
+        
+        .product-info {
+            flex: 1;
+            min-width: 280px;
+        }
+        
+        .product-images-container {
+            display: flex;
+            flex-direction: row;
+            gap: 1rem;
+            align-items: flex-start;
+            flex-shrink: 0;
+        }
+        
+        .product-description {
+            margin: 1rem 0;
+            line-height: 1.6;
+            color: var(--secondary);
+        }
+        .panel-content {
+            background: #fff;
+            border-radius: 16px;
+            padding: 2rem 2.5rem;
+            min-width: 320px;
+            max-width: 95vw;
+            max-height: 90vh;
+            box-shadow: 0 4px 24px rgba(34,34,59,0.13);
+            position: relative;
+            overflow-y: auto;
+        }
+        .panel-content h2 {
+            margin-top: 0;
+        }
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--danger);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .admin-form input, .admin-form select {
+            width: 100%;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+        .admin-form label {
+            font-weight: 500;
+        }
+        .admin-products-list {
+            margin-top: 1.5rem;
+        }
+        .admin-products-list table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .admin-products-list th, .admin-products-list td {
+            padding: 0.5rem;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+        .admin-products-list img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        .admin-products-list button {
+            background: var(--danger);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.2rem 0.7rem;
+            cursor: pointer;
+        }
+        .shopping-hall-list {
+            margin-top: 1rem;
+        }
+        .shopping-hall-list table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .shopping-hall-list th, .shopping-hall-list td {
+            padding: 0.5rem;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+        .shopping-hall-list img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        .shopping-hall-list button {
+            background: var(--danger);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.2rem 0.7rem;
+            cursor: pointer;
+        }
+        .auth-modal .panel-content {
+            min-width: 300px;
+            max-width: 95vw;
+        }
+        .auth-form input {
+            width: 100%;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+        .auth-form button {
+            width: 100%;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.6rem 0;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .auth-form .switch-link {
+            background: none;
+            color: var(--secondary);
+            border: none;
+            margin-top: 0.5rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+        
+        .quantity-controls button {
+            background: var(--accent);
+            color: var(--light);
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .quantity-controls input {
+            width: 50px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 0.2rem;
+        }
+        
+        .size-selector {
+            margin: 0.5rem 0;
+        }
+        
+        .size-selector select {
+            padding: 0.3rem;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        
+        .order-form {
+            margin-top: 1rem;
+        }
+        
+        .order-form input, .order-form select {
+            width: 100%;
+            margin-bottom: 0.8rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+        
+        .order-summary {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        .order-summary h4 {
+            margin-top: 0;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .tab-button {
+            background: var(--light);
+            border: 1px solid var(--accent);
+            color: var(--primary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .tab-button.active {
+            background: var(--accent);
+            color: var(--light);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        footer {
+            background: var(--primary);
+            color: var(--light);
+            text-align: center;
+            padding: 1.2rem 0 0.7rem 0;
+            border-radius: 16px 16px 0 0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .sidebar {
+                min-width: 0;
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+            header {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            .search-bar {
+                order: 3;
+                width: 100%;
+                margin-left: 0;
+                margin-top: 0.5rem;
+            }
+            .user-actions {
+                gap: 0.5rem;
+            }
+            .user-actions button {
+                padding: 0.3rem 0.8rem;
+                font-size: 0.9rem;
+            }
+        }
+        @media (max-width: 768px) {
+            .product-detail-content {
+                flex-direction: column;
+                padding: 1rem;
+                gap: 1rem;
+            }
+            .product-images-container {
+                flex-direction: column;
+                width: 100%;
+                align-items: center;
+            }
+            .product-main-image {
+                width: 100%;
+                max-width: 280px;
+                height: 250px;
+            }
+            .product-thumbnails {
+                flex-direction: row;
+                overflow-x: auto;
+                overflow-y: hidden;
+                max-height: 70px;
+                width: 100%;
+                justify-content: center;
+                gap: 0.5rem;
+            }
+            .product-thumbnail {
+                width: 45px;
+                height: 45px;
+                flex-shrink: 0;
+            }
+            .product-info {
+                min-width: auto;
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            header, .container, .panel-content {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                padding: 1rem 0.5rem;
+            }
+            .panel-content {
+                padding: 1rem;
+                margin: 0.5rem;
+            }
+            .admin-products-list table,
+            .shopping-hall-list table {
+                font-size: 0.8rem;
+            }
+            .admin-products-list th, 
+            .admin-products-list td,
+            .shopping-hall-list th, 
+            .shopping-hall-list td {
+                padding: 0.3rem;
+            }
+            .admin-products-list img,
+            .shopping-hall-list img {
+                width: 30px;
+                height: 30px;
+            }
+            .tab-buttons {
+                flex-wrap: wrap;
+                gap: 0.3rem;
+            }
+            .tab-button {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+            .admin-form input,
+            .admin-form select,
+            .auth-form input,
+            .order-form input,
+            .order-form select {
+                font-size: 0.9rem;
+                padding: 0.4rem;
+            }
+            .logo {
+                font-size: 1.2rem;
+            }
+            .logo-icon {
+                width: 28px;
+                height: 28px;
+            }
+            nav {
+                gap: 1rem;
+            }
+            nav a {
+                font-size: 0.9rem;
+            }
+            /* Product Detail Modal Improvements */
+            .product-detail-content {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 0.5rem;
+                max-width: 100vw;
+                min-width: 0;
+                gap: 0.5rem;
+            }
+            .product-images-container {
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
+                gap: 0.5rem;
+            }
+            .product-main-image {
+                width: 100%;
+                max-width: 320px;
+                height: auto;
+                aspect-ratio: 1/1;
+                margin: 0 auto;
+                display: block;
+            }
+            .product-thumbnails {
+                flex-direction: row;
+                overflow-x: auto;
+                overflow-y: hidden;
+                max-height: none;
+                width: 100%;
+                justify-content: flex-start;
+                gap: 0.5rem;
+                background: #f8f9fa;
+                padding: 0.5rem 0.2rem;
+                border-radius: 8px;
+                margin: 0.5rem 0 0.5rem 0;
+            }
+            .product-thumbnail {
+                width: 48px;
+                height: 48px;
+                flex-shrink: 0;
+            }
+            .product-info {
+                min-width: 0;
+                width: 100%;
+                margin-top: 0.5rem;
+            }
+            .product-info h2 {
+                font-size: 1.2rem;
+            }
+            .product-info .product-description {
+                font-size: 0.95rem;
+            }
+            .size-selector,
+            .quantity-controls {
+                width: 100%;
+                margin: 0.5rem 0;
+            }
+            .size-selector select,
+            .quantity-controls input {
+                font-size: 1rem;
+                padding: 0.5rem;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            .quantity-controls button {
+                width: 36px;
+                height: 36px;
+                font-size: 1.1rem;
+            }
+            #detailAddBtn {
+                padding: 0.8rem 0;
+                font-size: 1.1rem;
+                width: 100%;
+                margin-top: 0.5rem;
+            }
+            .close-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 1.2rem;
+                top: 0.5rem;
+                right: 0.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .product-detail-content {
+                padding: 0.5rem;
+                max-width: 99vw;
+            }
+            .product-main-image {
+                max-width: 200px;
+                height: 180px;
+            }
+            .product-thumbnail {
+                width: 35px;
+                height: 35px;
+            }
+            .product-info h2 {
+                font-size: 1.2rem;
+            }
+            .close-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 1rem;
+                top: 0.5rem;
+                right: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <svg class="logo-icon" viewBox="0 0 48 48">
+                <circle cx="24" cy="24" r="22" fill="#9a8c98"/>
+                <rect x="12" y="18" width="24" height="16" rx="4" fill="#fff"/>
+                <circle cx="20" cy="30" r="2" fill="#4a4e69"/>
+                <circle cx="28" cy="30" r="2" fill="#4a4e69"/>
+            </svg>
+            HBM Store
+        </div>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search products..." oninput="searchProducts()">
+            <button onclick="searchProducts()">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="7" cy="7" r="6"/>
+                    <line x1="11" y1="11" x2="15" y2="15"/>
+                </svg>
+            </button>
+        </div>
+        <div class="user-actions">
+            <button onclick="openShoppingHall()">🛒 Hall</button>
+            <button onclick="openAuthModal('login')">Login</button>
+            <button onclick="openAdminPanel()" id="adminPanelBtn" style="display:none;">Admin</button>
+            <button onclick="logout()" id="logoutBtn" style="display:none;">Logout</button>
+        </div>
+    </header>
+    <div class="container">
+        <aside class="sidebar">
+            <h3>Categories</h3>
+            <ul id="sidebarCategories">
+                <li><a href="#" onclick="filterCategory('All')" class="active">All</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            <div class="products-grid" id="productsGrid">
+                <!-- Products will be rendered here -->
+            </div>
+        </main>
+    </div>
+    <!-- Admin Panel Modal -->
+    <div class="admin-panel" id="adminPanel">
+        <div class="panel-content">
+            <button class="close-btn" onclick="closeAdminPanel()">×</button>
+            <h2>Admin Panel</h2>
+            
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="switchTab('products')">Products</button>
+                <button class="tab-button" onclick="switchTab('orders')">Orders</button>
+                <button class="tab-button" onclick="switchTab('categories')">Categories</button>
+                <button class="tab-button" onclick="switchTab('sizes')">Sizes</button>
+            </div>
+            
+            <div id="productsTab" class="tab-content active">
+                <form class="admin-form" id="adminForm" onsubmit="addProduct(event)">
+                    <label>Product Name</label>
+                    <input type="text" id="productName" required>
+                    
+                    <label>Description</label>
+                    <textarea id="productDescription" rows="4" style="width: 100%; padding: 0.5rem; border-radius: 8px; border: 1px solid #ccc; font-size: 1rem; font-family: inherit;" placeholder="Enter product description..."></textarea>
+                    
+                    <label>Categories</label>
+                    <div id="categoryCheckboxes" style="margin-bottom: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.5rem;">
+                        <!-- Categories will be populated here -->
+                    </div>
+                    
+                    <label>Image URLs (one per line)</label>
+                    <textarea id="productImages" rows="3" style="width: 100%; padding: 0.5rem; border-radius: 8px; border: 1px solid #ccc; font-size: 1rem; font-family: inherit;" placeholder="https://image1.jpg&#10;https://image2.jpg&#10;https://image3.jpg"></textarea>
+                    
+                    <label>Price (DZD)</label>
+                    <input type="number" id="productPrice" min="0" step="1" required>
+                    
+                    <label>Discount (%)</label>
+                    <input type="number" id="productDiscount" min="0" max="90" step="1" value="0">
+                    
+                    <label>Available Sizes & Stock</label>
+                    <div id="sizeStockContainer" style="margin-bottom: 1rem;">
+                        <!-- Size and stock inputs will be populated here -->
+                    </div>
+                    
+                    <button type="submit" id="addProductBtn">Add Product</button>
+                    <button type="button" onclick="cancelEdit()" id="cancelEditBtn" style="display:none;">Cancel Edit</button>
+                </form>
+                <div class="admin-products-list">
+                    <h3>Current Products</h3>
+                    <table id="adminProductsTable">
+                        <!-- Products will be listed here -->
+                    </table>
+                </div>
+            </div>
+            
+                        <div id="ordersTab" class="tab-content">
+                <h3>Customer Orders</h3>
+                <div id="ordersList">
+                    <!-- Orders will be listed here -->
+                </div>
+            </div>
+            
+            <div id="categoriesTab" class="tab-content">
+                <h3>Category Management</h3>
+                <div style="margin-bottom: 1rem;">
+                    <input type="text" id="newCategory" placeholder="New category name" style="margin-right: 0.5rem;">
+                    <button onclick="addCategory()" style="background: var(--success); color: white; border: none; border-radius: 4px; padding: 0.5rem 1rem; cursor: pointer;">Add Category</button>
+                </div>
+                <div id="categoriesList">
+                    <!-- Categories will be listed here -->
+                </div>
+            </div>
+            
+            <div id="sizesTab" class="tab-content">
+                <h3>Size Management</h3>
+                <p>Available sizes for all products. These will be shown to customers.</p>
+                <div style="margin-bottom: 1rem;">
+                    <input type="text" id="newSize" placeholder="Enter new size (e.g., XS, 2XL, 40, etc.)" onkeypress="if(event.key==='Enter'){event.preventDefault();addSize();}" style="padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; margin-right: 0.5rem; width: 250px;">
+                    <button onclick="addSize()" style="background: var(--success); color: white; border: none; border-radius: 4px; padding: 0.5rem 1rem; cursor: pointer;">Add Size</button>
+                </div>
+                <div id="sizesList">
+                    <!-- Sizes will be listed here -->
+                </div>
+            </div>
+ 
+
+        </div>
+    </div>
+    <!-- Shopping Hall Modal -->
+    <div class="shopping-hall" id="shoppingHall">
+        <div class="panel-content">
+            <button class="close-btn" onclick="closeShoppingHall()">×</button>
+            <h2>Shopping Hall</h2>
+            <div class="shopping-hall-list">
+                <table id="shoppingHallTable">
+                    <!-- Shopping hall products here -->
+                </table>
+            </div>
+            <div style="margin-top: 1rem; text-align: center;">
+                <button onclick="openOrderModal()" style="background: var(--success); color: white; padding: 0.8rem 2rem; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer;">Place Order</button>
+            </div>
+        </div>
+    </div>
+    <!-- Auth Modal -->
+    <div class="auth-modal" id="authModal">
+        <div class="panel-content">
+            <button class="close-btn" onclick="closeAuthModal()">×</button>
+            <h2 id="authTitle">Login</h2>
+            <form class="auth-form" id="authForm" onsubmit="handleAuth(event)">
+                <input type="text" id="authUsername" placeholder="Username" required>
+                <input type="password" id="authPassword" placeholder="Password" required>
+                <button type="submit" id="authSubmitBtn">Login</button>
+                <button type="button" class="switch-link" onclick="switchAuthMode()">Don't have an account? Sign Up</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Product Detail Modal -->
+    <div class="product-detail-modal" id="productDetailModal">
+        <div class="product-detail-content">
+            <button class="close-btn" onclick="closeProductDetail()">×</button>
+            <div class="product-images-container">
+                <img id="productMainImage" class="product-main-image" src="" alt="">
+                <div class="product-thumbnails" id="productThumbnails">
+                    <!-- Thumbnails will be populated here -->
+                </div>
+            </div>
+            <div class="product-info">
+                <h2 id="productDetailName"></h2>
+                <div id="productDetailCategories" style="font-size: 1rem; color: var(--secondary); margin-bottom: 1rem;"></div>
+                <div id="productDetailPrice" style="margin-bottom: 1rem;"></div>
+                <div class="product-description" id="productDetailDescription"></div>
+                
+                <div class="size-selector" style="margin: 1rem 0;">
+                    <label>Select Size:</label>
+                    <select id="detailSize" onchange="onDetailSizeChange()">
+                        <!-- Sizes will be populated here -->
+                    </select>
+                </div>
+                
+                <div class="quantity-controls" style="margin: 1rem 0;">
+                    <label>Quantity:</label>
+                    <button onclick="changeDetailQuantity(-1)">-</button>
+                    <input type="number" id="detailQty" value="1" min="1" max="3" onchange="updateDetailQuantity()">
+                    <button onclick="changeDetailQuantity(1)">+</button>
+                </div>
+                
+                <button onclick="addToShoppingHallFromDetail()" id="detailAddBtn" style="background: var(--accent); color: white; padding: 0.8rem 2rem; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; width: 100%;">
+                    Add to Hall
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Order Modal -->
+    <div class="order-modal" id="orderModal">
+        <div class="panel-content">
+            <button class="close-btn" onclick="closeOrderModal()">×</button>
+            <h2>Complete Your Order</h2>
+            <form class="order-form" id="orderForm" onsubmit="placeOrder(event)">
+                <label>Full Name</label>
+                <input type="text" id="orderName" required>
+                
+                <label>Phone Number</label>
+                <input type="tel" id="orderPhone" required>
+                
+                <label>Email (Optional)</label>
+                <input type="email" id="orderEmail">
+                
+                <label>Wilaya</label>
+                <select id="orderWilaya" required onchange="updateDairas()">
+                    <option value="">Select Wilaya</option>
+                </select>
+                
+                <label>Daira</label>
+                <select id="orderDaira" required>
+                    <option value="">Select Daira</option>
+                </select>
+                
+                <label>Address</label>
+                <input type="text" id="orderAddress" required placeholder="Street, building, apartment...">
+                
+                <div class="order-summary">
+                    <h4>Order Summary</h4>
+                    <div id="orderSummaryContent"></div>
+                    <div style="margin-top: 1rem; font-weight: bold;">
+                        <div>Subtotal: <span id="orderSubtotal">0</span> DZD</div>
+                        <div>Delivery: 1000 DZD</div>
+                        <div style="font-size: 1.2rem; color: var(--primary);">Total: <span id="orderTotal">0</span> DZD</div>
+                    </div>
+                </div>
+                
+                <button type="submit" style="background: var(--success); color: white; padding: 0.8rem; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; width: 100%;">Confirm Order</button>
+            </form>
+        </div>
+    </div>
+    <footer>
+        <div>
+            &copy; 2024 HBM store. | <a href="mailto:contact@shopease.com" style="color:#9a8c98;">Contact</a>
+        </div>
+        <div style="margin-top:0.5em;">
+           
+          
+    <script>
+        // --- Data Storage ---
+        const ADMIN_CREDENTIALS = { username: "admin", password: "admin123" };
+        let products = JSON.parse(localStorage.getItem('products') || '[]');
+        let users = JSON.parse(localStorage.getItem('users') || '[]');
+        let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+        let shoppingHall = JSON.parse(localStorage.getItem('shoppingHall') || '{}');
+        // shoppingHall structure: { username: [{ productId, quantity, size }, ...] }
+        let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+        let categories = JSON.parse(localStorage.getItem('categories') || '["Men", "Women", "Children"]');
+        let availableSizes = JSON.parse(localStorage.getItem('availableSizes') || '["S", "M", "L", "XL", "XXL", "XXXL"]');
+        let currentCategory = 'All';
+        let searchQuery = '';
+        
+        // Algerian Wilayas and Dairas (58 wilayas)
+        const ALGERIAN_WILAYAS = {
+            "Adrar": ["Adrar", "Aougrout", "Aoulef", "Bordj Badji Mokhtar", "Charouine", "Fenoughil", "Reggane", "T'Sabit", "Timimoun", "Zaouiet Kounta"],
+            "Chlef": ["Chlef", "Abou El Hassan", "Ain Merane", "Boukadir", "Chettia", "El Karimia", "El Marsa", "Oued Fodda", "Ouled Ben Abdelkader", "Ouled Fares", "Taougrit", "Tenes", "Zeboudja"],
+            "Laghouat": ["Laghouat", "Aflou", "Ain Madhi", "Brida", "El Assafia", "El Ghicha", "Gueltat Sidi Saad", "Hassi Delaa", "Hassi R'Mel", "Kheneg", "Ksar El Hirane", "Oued Morra", "Oued M'Zi", "Sebgag", "Sidi Makhlouf", "Tadjemout", "Tadjrouna", "Taouiala"],
+            "Oum El Bouaghi": ["Oum El Bouaghi", "Ain Babouche", "Ain Beida", "Ain Diss", "Ain Fakroun", "Ain Kercha", "Ain M'lila", "Ain Zitoun", "Behir Chergui", "Berriche", "Bir Chouhada", "Dhalaa", "El Amiria", "El Belala", "El Djazia", "El Fedjoudj", "El Harmilia", "Ouled Gacem", "Ouled Hamla", "Ouled Zouai", "Rahia", "Sigus", "Souk Naamane", "Zorg"],
+            "Batna": ["Batna", "Ain Djasser", "Ain Touta", "Arris", "Barika", "Bouzina", "Chemora", "Djezzar", "El Madher", "Fesdis", "Foum Toub", "Ghassira", "Gosbat", "Guigba", "Hidoussa", "Ichmoul", "Inoughissen", "Kimmel", "Ksar Bellezma", "Larbaa", "Lazrou", "Lemsane", "Maafa", "Menaa", "Merouana", "Metkaouak", "N'Gaous", "Oued Chaaba", "Oued El Ma", "Oued Taga", "Ouled Aouf", "Ouled Fadel", "Ouled Sellam", "Ouled Si Slimane", "Ouyoun El Assafir", "Rahbat", "Ras El Aioun", "Sefiane", "Seggana", "Seriana", "T'Kout", "Talkhamt", "Taxlent", "Teniet El Abed", "Tighanimine", "Tigzirt", "Tilatou", "Timgaouine", "Zanat El Beida"],
+            "Bejaia": ["Bejaia", "Adekar", "Ain El Hammam", "Ain Ksila", "Akbou", "Akfadou", "Amalou", "Amizour", "Aokas", "Barbacha", "Beni Djellil", "Beni Ksila", "Beni Maouche", "Beni Mellikeche", "Beni Ourtilane", "Bouhamza", "Boukhelifa", "Chemini", "Darguina", "Draa El Kaid", "El Flaye", "El Kseur", "Fenaia Ilmaten", "Ferraoun", "Ighil Ali", "Ighram", "Kendira", "Kherrata", "Leflaye", "Mechdallah", "Oued Ghir", "Ouzellaguen", "Seddouk", "Sidi Aich", "Sidi Ayad", "Souk El Tenine", "Souk Oufella", "Tala Hamza", "Tamokra", "Tamridjet", "Taourirt Ighil", "Taskriout", "Tazmalt", "Tibane", "Tichy", "Tifra", "Timezrit", "Tinabdher", "Tizi N'Berber", "Toudja", "Yatafene"],
+            "Biskra": ["Biskra", "Ain Naga", "Ain Zaatout", "Bordj Ben Azzouz", "Bouchagroun", "Branis", "Chetma", "Djemorah", "Doucen", "El Feidh", "El Kantara", "El Mizaraa", "El Outaya", "Foughala", "Khenguet Sidi Nadji", "Lichana", "Lioua", "M'Chouneche", "Mekhadma", "M'Lili", "Ouled Djellal", "Oumache", "Ourlal", "Ras El Miaad", "Sidi Khaled", "Sidi Okba", "Tolga", "Zeribet El Oued"],
+            "Bechar": ["Bechar", "Abadla", "Bechar", "Beni Abbes", "Beni Ikhlef", "Beni Ounif", "El Ouata", "Igli", "Kenadsa", "Kerzaz", "Lahmar", "Mechraa Houari Boumediene", "Meridja", "Mogheul", "Ouled Khodeir", "Tabalbala", "Taghit", "Tamtert", "Timoudi"],
+            "Blida": ["Blida", "Ain Romana", "Beni Merad", "Beni Tamou", "Blida", "Bouarfa", "Boufarik", "Bougara", "Bouinan", "Chebli", "Chiffa", "Chrea", "Djebabra", "Douera", "El Affroun", "El Kerma", "Hammam Elouane", "Larbaa", "Meftah", "Mouzaia", "Oued Alleug", "Oued Djer", "Ouled Laich", "Ouled Slama", "Ouled Yaich", "Souhane", "Soumaa"],
+            "Bouira": ["Bouira", "Aghbalou", "Ahl El Ksar", "Ain El Hadjar", "Ain Turk", "Ait Laaziz", "Ath Mansour Taourirt", "Bechloul", "Bir Ghbalou", "Bordj Okhriss", "Bouderbala", "Bouira", "Boukram", "Chorfa", "Dechmia", "Dirrah", "Djebahia", "El Adjiba", "El Asnam", "El Hachimia", "El Khabouzia", "El Mokrani", "Guerrouma", "Hadjera Zerga", "Haizer", "Kadiria", "Lakhdaria", "M'Chedallah", "Maala", "Maamora", "Oued El Berdi", "Ouled Rached", "Raouraoua", "Ridane", "Saharidj", "Sour El Ghozlane", "Taguedit", "Taghzout", "Z'barbar"],
+            "Tamanrasset": ["Tamanrasset", "Abalessa", "In Ghar", "In Guezzam", "In Salah", "Tazrouk", "Tin Zaouatine"],
+            "Tebessa": ["Tebessa", "Ain Zerga", "Bedjene", "Bekkaria", "Bir Dheheb", "Bir El Ater", "Boukhadra", "Boulhaf Dir", "Cheria", "El Aouinet", "El Kouif", "El Ma Labiodh", "El Meridj", "El Mezeraa", "El Ogla", "Ferkane", "Guorriguer", "Hammamet", "Lahouidjbet", "Morsott", "Negrine", "Ouenza", "Oum Ali", "Safsaf El Ouesra", "Stah Guentis", "Tebessa"],
+            "Tlemcen": ["Tlemcen", "Ain Fetah", "Ain Ghoraba", "Ain Kebira", "Ain Nehala", "Ain Tallout", "Ain Youcef", "Amieur", "Azails", "Bab El Assa", "Bensekrane", "Beni Boussaid", "Beni Mester", "Beni Ouarsous", "Beni Snous", "Bouhlou", "Chetouane", "Dar Yaghmouracene", "Djebala", "El Aricha", "El Bouihi", "El Fehoul", "El Gor", "Hennaya", "Honnaine", "Maghnia", "Marsa Ben M'Hidi", "Nedroma", "Oued Lakhdar", "Ouled Mimoun", "Ouled Riyah", "Remchi", "Sabra", "Sebbaa Chioukh", "Sebdou", "Serain", "Sidi Abdelli", "Sidi Djillali", "Sidi Medjahed", "Terny Beni Hdiel", "Tianet", "Tlemcen", "Zenata"],
+            "Tiaret": ["Tiaret", "Ain Bouchekif", "Ain Deheb", "Ain El Hadid", "Ain Kermes", "Ain Zarit", "Bougara", "Chehaima", "Dahmouni", "Djebilet Rosfa", "Faidja", "Frenda", "Guertoufa", "Hamadia", "Ksar Chellala", "Madna", "Mahdia", "Mechraa Safa", "Medrissa", "Medroussa", "Meghila", "Mellakou", "Nadorah", "Naima", "Oued Lilli", "Rahouia", "Rechaiga", "Sebaine", "Sebt", "Serghine", "Si Abdelghani", "Sidi Ali Mellal", "Sidi Bakhti", "Sidi Hosni", "Sougueur", "Tagdemt", "Takhemaret", "Tiaret", "Tidda", "Tousnina", "Zmalet El Emir Abdelkader"],
+            "Tizi Ouzou": ["Tizi Ouzou", "Ain El Hammam", "Ain Zaouia", "Ait Aggouacha", "Ait Bouadou", "Ait Boumahdi", "Ait Chafaa", "Ait Khelili", "Ait Mahmoud", "Ait Oumalou", "Ait Toudert", "Ait Yahia", "Ait Yahia Moussa", "Akbil", "Akerrou", "Assi Youcef", "Azazga", "Azeffoun", "Beni Aissi", "Beni Douala", "Beni Yenni", "Beni Ziki", "Beni Zmenzer", "Boghni", "Boudjima", "Bounouh", "Draa Ben Khedda", "Draa El Mizan", "Freha", "Frikat", "Iboudraren", "Idjeur", "Iferhounene", "Ifigha", "Iflissen", "Illilten", "Illoula Oumalou", "Imsouhal", "Irdjen", "Larba Nath Irathen", "M'Kira", "Maatkas", "Makouda", "Mechtras", "Mizrana", "Ouacif", "Ouadhia", "Ouaguenoun", "Sidi Namane", "Souamaa", "Souk El Thenine", "Tadmait", "Tigzirt", "Timizart", "Tirmitine", "Tizi Gheniff", "Tizi Ouzou", "Tizi Rached", "Yakouren", "Zekri"],
+            "Alger": ["Alger", "Ain Benian", "Ain Taya", "Alger Centre", "Bab El Oued", "Bab Ezzouar", "Baba Hassen", "Bachdjerrah", "Baraki", "Ben Aknoun", "Beni Messous", "Bir Mourad Rais", "Birkhadem", "Birtouta", "Bologhine", "Bordj El Bahri", "Bordj El Kiffan", "Bourouba", "Casbah", "Cheraga", "Dar El Beida", "Djasr Kasentina", "Douera", "Draria", "El Achour", "El Biar", "El Harrach", "El Madania", "El Magharia", "El Marsa", "El Mouradia", "Hamma Annassers", "Herraoua", "Hussein Dey", "Kouba", "Les Eucalyptus", "Mahelma", "Mohammadia", "Oued Koriche", "Oued Smar", "Ouled Chebel", "Ouled Fayet", "Rais Hamidou", "Reghaia", "Rouiba", "Saoula", "Sidi M'Hamed", "Sidi Moussa", "Souidania", "Staoueli", "Tessala El Merdja", "Zeralda"],
+            "Djelfa": ["Djelfa", "Ain Chouhada", "Ain El Ibel", "Ain Feka", "Ain Maabed", "Ain Oussera", "Amourah", "Benhar", "Beni Yagoub", "Birine", "Bouira Lahdab", "Charef", "Dar Chioukh", "Deldoul", "Djelfa", "Douis", "El Guedid", "El Idrissia", "El Khemis", "Faidh El Botma", "Guernini", "Guettara", "Had Sahary", "Hassi Bahbah", "Hassi El Euch", "Hassi Fedoul", "Messaad", "M'Liliha", "Mouilha", "Oum Laadham", "Sed Rahal", "Selmana", "Sidi Baizid", "Sidi Laadjel", "Tadmit", "Zaafrane", "Zaccar"],
+            "Jijel": ["Jijel", "Ain El Melh", "Ain Errich", "Ain Kechra", "Ain Roua", "Ain Tine", "Bordj T'har", "Boudriaa Ben Yadjis", "Bouraoui Belhadef", "Chahna", "Chekfa", "Djemaa Beni Habibi", "Djemaa Ouled Cheikh", "El Ancer", "El Aouana", "El Kennar Nouchfi", "El Milia", "Erraguene", "Ghebala", "Jijel", "Kaous", "Kemir Oued Adjoul", "Oudjana", "Ouled Rabah", "Ouled Yahia Khadrouch", "Selma Benziada", "Settara", "Sidi Abdelaziz", "Sidi Maarouf", "Taher", "Texenna", "Ziama Mansouriah"],
+            "Setif": ["Setif", "Ain Abessa", "Ain Arnat", "Ain Azel", "Ain El Kebira", "Ain Lahdjar", "Ain Legraj", "Ain Oulmene", "Ain Roua", "Ain Sebt", "Ain Taghrout", "Ain Tebbin", "Ain Yagout", "Amoucha", "Aougrout", "Azzaba", "Babor", "Bazer Sakhra", "Beidha Bordj", "Belaa", "Beni Aziz", "Beni Chebana", "Beni Fouda", "Beni Hocine", "Beni Ourtilane", "Beni Oussine", "Bouandas", "Bougaa", "Bousselam", "Boutaleb", "Dehamcha", "Djemila", "Draa Kebila", "El Eulma", "El Ouricia", "Guelta Zerka", "Guelal", "Hamma", "Hammam Guergour", "Hammam Soukhna", "Harbil", "Ksar El Abtal", "Maaouia", "Maoklane", "Mezloug", "Oued El Barad", "Ouled Addi Guebala", "Ouled Brahim", "Ouled Si Ahmed", "Ouled Tebben", "Oum El Adhaim", "Rasfa", "Salah Bey", "Serdj El Ghoul", "Setif", "Tachouda", "Talaifacene", "Taya", "Tella", "Tizi N'Bechar"],
+            "Saida": ["Saida", "Ain El Hadjar", "Ain Fekan", "Ain Fras", "Ain Lahdjar", "Ain Soltane", "Aoubellil", "Benachiba Chelia", "Bir El Hammam", "Doui Thabet", "El Hassasna", "Hounet", "Moulay Larbi", "Oued El Abtal", "Ouled Brahim", "Ouled Khaled", "Saida", "Sidi Ahmed", "Sidi Amar", "Sidi Boubekeur", "Tircine", "Youb"],
+            "Skikda": ["Skikda", "Ain Bouziane", "Ain Charchar", "Ain Kechra", "Ain Zouit", "Azzaba", "Bekkouche Lakhdar", "Ben Azzouz", "Beni Bechir", "Beni Oulbane", "Beni Zid", "Bin El Ouiden", "Bouchtata", "Cheraia", "Collo", "Djendel", "El Ghedir", "El Harrouch", "El Marsa", "Emjez Edchich", "Essebt", "Filfila", "Hamadi Krouma", "Ibn Ziad", "Karkira", "Lazghar", "Oued El Haddad", "Oued Zehour", "Ouled Attia", "Ouled Hebaba", "Ouled Zouai", "Oum Toub", "Ramdane Djamel", "Salah Bouchaour", "Sidi Mezghiche", "Skikda", "Tamalous", "Zerdazas", "Zitouna"],
+            "Sidi Bel Abbes": ["Sidi Bel Abbes", "Ain Adden", "Ain El Berd", "Ain Kada", "Ain Thrid", "Ain Tindamine", "Amarnas", "Badredine El Mokrani", "Belarbi", "Ben Badis", "Benachiba Chelia", "Bir El Hammam", "Boudjebaa El Bordj", "Bouhanifia", "Boukhanafis", "Chetouane Belaila", "Dhaya", "El Hacaiba", "Hassi Dahou", "Hassi Zehana", "Lamtar", "M'Cid", "Makedra", "Marhoum", "Merine", "Mostefa Ben Brahim", "Moulay Slissen", "Oued Sebaa", "Oued Sefioun", "Oued Taourira", "Ras El Ma", "Redjem Demouche", "Sehala Thaoura", "Sfisef", "Sidi Ali Benyoub", "Sidi Ali Boussidi", "Sidi Bel Abbes", "Sidi Brahim", "Sidi Chaib", "Sidi Dahou De Zairs", "Sidi Hamadouche", "Sidi Khaled", "Sidi Lahcene", "Sidi Yacoub", "Tabia", "Tafissour", "Tahouda", "Tenira", "Tessala", "Tilmouni", "Zerouala"],
+            "Annaba": ["Annaba", "Ain Berda", "Ain Kerma", "Annaba", "Berrahal", "Chetaibi", "Cheurfa", "Echatt", "El Bouni", "El Hadjar", "Oued El Aneb", "Seraidi", "Sidi Amar", "Treat"],
+            "Guelma": ["Guelma", "Ain Ben Beida", "Ain Larbi", "Ain Makhlouf", "Ain Reggada", "Ain Sandel", "Belkheir", "Ben Djarah", "Beni Mezline", "Bordj Sabat", "Bou Hachana", "Bou Hamdane", "Bouati Mahmoud", "Bouchegouf", "Boumahra Ahmed", "Dahouara", "Djeballah Khemissi", "El Fedjoudj", "Guellat Bou Sbaa", "Guelma", "Hammam Debagh", "Hammam Maskhoutine", "Hammam Nbail", "Heliopolis", "Kheirane", "Medjez Amar", "Medjez Sfa", "Nechmaya", "Oued Cheham", "Oued Fragha", "Oued Zenati", "Ras El Agba", "Roknia", "Salaoua Announa", "Tamlouka", "Taya"],
+            "Constantine": ["Constantine", "Ain Abid", "Ain Smara", "Beni Hamiden", "Beni Meriem", "Chahia", "Chettouh", "Constantine", "Didouche Mourad", "El Khroub", "El Meridj", "Hamma Bouziane", "Ibn Ziad", "Messaoud Boudjriou", "Oued Athmania", "Ouled Rahmoune", "Zighoud Youcef"],
+            "Medea": ["Medea", "Ain Boucif", "Ain Ouksir", "Aissaouia", "Aziz", "Baata", "Benchicao", "Beni Slimane", "Berrouaghia", "Boghar", "Bouaichoune", "Bouaiche", "Boumedfaa", "Chabounia", "Chellalet El Adhaoura", "Cheniguel", "Damiat", "Derrag", "Djouab", "Draa Essamar", "El Azizia", "El Omaria", "El Ouinet", "Hannacha", "Kef Lakhdar", "Khams Djouamaa", "Ksar El Boukhari", "Medea", "Medjebar", "Meftaha", "Meghraoua", "Mihoub", "Ouamri", "Oued Harbil", "Ouled Antar", "Ouled Bouachra", "Ouled Deide", "Ouled Hellal", "Ouled Maaref", "Oum El Djalil", "Ouzera", "Rebaia", "Saneg", "Sedraia", "Seghouane", "Si Mahdjoub", "Sidi Damed", "Sidi Errabia", "Sidi Naamane", "Sidi Zahar", "Sidi Ziane", "Souagui", "Tablat", "Tafraout", "Tamesguida", "Tlatet Eddouair", "Zoubiria"],
+            "Mostaganem": ["Mostaganem", "Achaacha", "Ain Boudinar", "Ain Nouissy", "Ain Sidi Cherif", "Ain Tedles", "Bouguirat", "El Hassiane", "Fornaka", "Hadjadj", "Hassi Mameche", "Kheir Eddine", "Mansourah", "Mesra", "Mostaganem", "Nekmaria", "Oued El Kheir", "Ouled Boughalem", "Ouled Maallah", "Safsaf", "Sayada", "Sidi Ali", "Sidi Lakhdar", "Sirat", "Souaflia", "Stidia", "Tazgait", "Touahria"],
+            "M'Sila": ["M'Sila", "Ain El Hadjel", "Ain El Melh", "Ain Errich", "Ain Fares", "Ain Khadra", "Ain Rich", "Ain Touila", "Belaiba", "Ben Srour", "Berhoum", "Bir Foda", "Bou Saada", "Bouti Sayah", "Chellal", "Dehahna", "Djebel Messaad", "El Hamel", "El Houamed", "Hammam Dhalaa", "Khoubana", "Maadid", "Maarif", "Magra", "M'Cif", "Medjedel", "Menaa", "M'Sila", "M'Tarfa", "Ouanougha", "Ouled Addi Guebala", "Ouled Derradj", "Ouled Madhi", "Ouled Mansour", "Ouled Sidi Brahim", "Ouled Slimane", "Oultene", "Sidi Aissa", "Sidi Hadjeres", "Sidi M'Hamed", "Slim", "Souamaa", "Tamsa", "Tarmount", "Zarzour", "Zerarka"],
+            "Mascara": ["Mascara", "Ain Fares", "Ain Fekan", "Ain Ferah", "Ain Fras", "Alaimia", "Aouf", "Beniane", "Bou Hanifia", "Bou Henni", "Chorfa", "El Bordj", "El Gaada", "El Ghomri", "Ghriss", "Guerdjoum", "Hachem", "Hacine", "Khalouia", "Makdha", "Mamounia", "Mascara", "Matemore", "Mocta Douz", "Mohammadia", "Oggaz", "Oued El Abtal", "Oued Taria", "Ras Ain Amirouche", "Sedjerara", "Sehailia", "Sidi Abdelmoumen", "Sidi Boussaid", "Sidi Kada", "Sig", "Tighennif", "Tizi", "Zahana", "Zelameta"],
+            "Ouargla": ["Ouargla", "Ain Beida", "El Borma", "El Hadjira", "El Allia", "Gassi Touil", "Hassi Ben Abdellah", "Hassi Messaoud", "M'Gaid", "N'Goussa", "Ouargla", "Rouissat", "Sidi Khouiled", "Taibet", "Tebesbest", "Touggourt", "Zaouia El Abidia"],
+            "Oran": ["Oran", "Ain El Turk", "Arzew", "Ben Freha", "Bethioua", "Bir El Djir", "Boufatis", "Bousfer", "El Ancor", "El Braya", "El Karma", "El Oued", "Es Senia", "Gdyel", "Hassi Ben Okba", "Hassi Bounif", "Hassi Mefsoukh", "Mers El Kebir", "Misserghin", "Oran", "Oued Tlelat", "Sidi Ben Yabka", "Sidi Chami", "Tafraoui"],
+            "El Bayadh": ["El Bayadh", "Arbaouet", "Asla", "Boualem", "Bougtob", "Boussemghoun", "Chellala", "Cheguig", "Djemaa Ouled Cheikh", "El Abiodh Sidi Cheikh", "El Bayadh", "El Bnoud", "El Kheither", "El Mehara", "Ghassoul", "Kef El Ahmar", "Krakda", "Rogassa", "Sidi Ameur", "Sidi Slimane", "Sidi Tifour", "Stitten", "Tousmouline"],
+            "Illizi": ["Illizi", "Bordj Omar Driss", "Debdeb", "Illizi", "In Amenas"],
+            "Bordj Bou Arreridj": ["Bordj Bou Arreridj", "Ain Taghrout", "Ain Tesra", "Belimour", "Ben Daoud", "Bir Kasdali", "Bordj Bou Arreridj", "Bordj Ghdir", "Bordj Zemmoura", "Colla", "Djaafra", "El Ach", "El Achir", "El Anseur", "El Hamadia", "El Main", "El M'hir", "Ghilassa", "Haraza", "Hasnaoua", "Khelil", "Ksour", "Mansoura", "Medjana", "Ouled Brahem", "Ouled Dahmane", "Ouled Sidi Brahim", "Rabta", "Ras El Oued", "Sidi Embarek", "Tafreg", "Taglait", "Teniet En Nasr"],
+            "Boumerdes": ["Boumerdes", "Afir", "Ammal", "Baghlia", "Ben Choud", "Beni Amrane", "Bordj Menaiel", "Boudouaou", "Boudouaou El Bahri", "Boumerdes", "Bouzegza Keddara", "Chabet El Ameur", "Corso", "Dellys", "Djinet", "El Kharrouba", "Hammedi", "Issers", "Khemis El Khechna", "Larbatache", "Leghata", "Naciria", "Ouled Aissa", "Ouled Hedadj", "Ouled Moussa", "Si Mustapha", "Sidi Daoud", "Souk El Had", "Taourga", "Thenia", "Tidjelabine", "Timezrit", "Zemmouri"],
+            "El Tarf": ["El Tarf", "Ain El Assel", "Ain Kerma", "Asfour", "Barrahel", "Ben M'Hidi", "Berrihane", "Besbes", "Bouhadjar", "Bouteldja", "Chebaita Mokhtar", "Chefia", "Chihani", "Drean", "El Aioun", "El Kala", "El Tarf", "Hammam Beni Salah", "Lac Des Oiseaux", "Oued Zitoun", "Raml Souk", "Souarekh", "Zerizer", "Zitouna"],
+            "Tindouf": ["Tindouf", "Oum El Assel", "Tindouf"],
+            "Tissemsilt": ["Tissemsilt", "Ammari", "Beni Chaib", "Beni Lahcene", "Bordj Bounaama", "Bordj El Emir Abdelkader", "Khemisti", "Lardjem", "Lazharia", "Maacem", "Melaab", "Ouled Bessem", "Sidi Abed", "Sidi Boutouchent", "Sidi Lantri", "Sidi Slimane", "Tamalaht", "Théniet El Had", "Tissemsilt", "Youssoufia"],
+            "El Oued": ["El Oued", "Bayadha", "Debila", "Djamaa", "Douar El Ma", "El M'Ghair", "El Oued", "Guemar", "Hamraia", "Hassani Abdelkrim", "Hassi Khelifa", "Kouinine", "Magrane", "Mih Ouansa", "M'Rara", "Nakhla", "Oued El Alenda", "Oum Touyour", "Ourmes", "Reguiba", "Robbah", "Sidi Amrane", "Sidi Aoun", "Still", "Taghzout", "Taleb Larbi", "Tendla", "Trifaoui"],
+            "Khenchela": ["Khenchela", "Ain Touila", "Babar", "Baghai", "Bouhmama", "Chechar", "Chelia", "Djellal", "El Hamma", "El Mahmal", "El Oueldja", "Ensigha", "Fais", "Kais", "Khenchela", "Khirane", "M'Sara", "M'toussa", "Ouled Rechache", "Remila", "Tamza", "Yabous"],
+            "Souk Ahras": ["Souk Ahras", "Ain Zana", "Ain Soltane", "Bir Bouhouche", "Drea", "Haddada", "Hanencha", "Khedara", "Khemissa", "M'Daourouch", "Merahna", "Oued Keberit", "Ouled Driss", "Ouled Moumen", "Oum El Adhaim", "Ragouba", "Safel El Ouiden", "Sedrata", "Sidi Fredj", "Souk Ahras", "Taoura", "Terraguelt", "Tiffech", "Zaarouria", "Zouabi"],
+            "Tipaza": ["Tipaza", "Ahmer El Ain", "Ain Tagourait", "Attatba", "Beni Milleuk", "Bou Haroun", "Bou Ismael", "Bouchaoui", "Bourkika", "Chaiba", "Cherchell", "Damous", "Douaouda", "Fouka", "Gouraya", "Hadjout", "Kolea", "Larhat", "Menaceur", "Messelmoun", "Nador", "Sidi Amar", "Sidi Ghiles", "Sidi Rached", "Sidi Semiane", "Tipaza"],
+            "Mila": ["Mila", "Ain Beida Harriche", "Ain Mellouk", "Ain Tine", "Ahmed Rachedi", "Amira Arras", "Benyahia Abderrahmane", "Bouhatem", "Chelghoum Laid", "Chigara", "Derradji Bousselah", "El Mechira", "Elayadi Barbes", "Ferdjioua", "Grarem Gouga", "Hamala", "Mila", "Minar Zarza", "Oued Athmania", "Oued Endja", "Oued Seguen", "Ouled Khalouf", "Rouached", "Sidi Khelifa", "Sidi Merouane", "Tadjenanet", "Tassadane Haddada", "Teleghma", "Terrai Bainen", "Tiberguent", "Yahia Beniguecha", "Zeghaia"],
+            "Ain Defla": ["Ain Defla", "Ain Benian", "Ain Bouyahia", "Ain Defla", "Ain Lechiekh", "Ain Soltane", "Ain Torki", "Arib", "Bathia", "Belaas", "Ben Allal", "Bir Ould Khelifa", "Bordj Emir Khaled", "Boumedfaa", "Bourached", "Djelida", "Djemaa Ouled Cheikh", "El Abadia", "El Amra", "El Attaf", "El Hassania", "El Maine", "Hammam Righa", "Hoceinia", "Khemis Miliana", "Mekhatria", "Miliana", "Oued Chorfa", "Oued Djemaa", "Ouled El Ma", "Rouina", "Sidi Lakhdar", "Tacheta Zougagha", "Tarik Ibn Ziad", "Tiberkanine", "Zeddine"],
+            "Naama": ["Naama", "Ain Ben Khelil", "Ain Sefra", "Asla", "Djeniene Bourezg", "El Biod", "Kasdir", "Makman Ben Amer", "Mecheria", "Moghrar", "Naama", "Sfissifa", "Tiout", "Tousmouline"],
+            "Ain Temouchent": ["Ain Temouchent", "Aghlal", "Ain El Arbaa", "Ain Kihal", "Ain Tolba", "Ain Temouchent", "Aoubellil", "Beni Saf", "Bou Zedjar", "Chaabet El Leham", "Chentouf", "El Amria", "El Emir Abdelkader", "El Malah", "El Messaid", "Hammam Bou Hadjar", "Hassasna", "Oued Berkeche", "Oued Sabah", "Ouled Boudjemaa", "Ouled Kihal", "Ouled Mimoun", "Sidi Ben Adda", "Sidi Boumediene", "Sidi Ouriache", "Sidi Safi", "Tamzoura", "Terga"],
+            "Ghardaia": ["Ghardaia", "Berriane", "Bounoura", "Dhayet Bendhahoua", "El Atteuf", "El Guerrara", "El Menea", "Ghardaia", "Hassi Fehal", "Hassi Gara", "Metlili", "Sebseb", "Zelfana"],
+            "Relizane": ["Relizane", "Ain Rahma", "Ain Tarik", "Ammi Moussa", "Belassel Bouzegza", "Bendaoud", "Beni Dergoun", "Beni Zentis", "Dar Ben Abdellah", "Djidiouia", "El H'Madna", "El Matmar", "El Ouldja", "Had Echkalla", "Hamri", "Kalaa", "Lahlef", "Mazouna", "Mediouna", "Mendes", "Merdja Sidi Abed", "Ouarizane", "Oued El Djemaa", "Oued Essalem", "Ouled Aiche", "Ouled Sidi Mihoub", "Ramka", "Relizane", "Sidi M'Hamed Ben Ali", "Sidi M'Hamed Benaouda", "Sidi Saada", "Souk El Had", "Yellel", "Zemmora"],
+            "El M'Ghair": ["El M'Ghair", "El M'Ghair", "El Meniaa", "Hassi Gara", "M'Rara", "Oum Touyour", "Sidi Amrane", "Still"],
+            "El Meniaa": ["El Meniaa", "El Meniaa", "Hassi Gara", "M'Rara", "Oum Touyour", "Sidi Amrane", "Still"],
+            "Ouled Djellal": ["Ouled Djellal", "Ouled Djellal", "Djemorah", "Doucen", "El Feidh", "El Kantara", "El Mizaraa", "El Outaya", "Foughala", "Khenguet Sidi Nadji", "Lichana", "Lioua", "M'Chouneche", "Mekhadma", "M'Lili", "Oumache", "Ourlal", "Ras El Miaad", "Sidi Khaled", "Sidi Okba", "Tolga", "Zeribet El Oued"],
+            "Bordj Baji Mokhtar": ["Bordj Baji Mokhtar", "Bordj Baji Mokhtar", "Adrar", "Aougrout", "Aoulef", "Charouine", "Fenoughil", "Reggane", "T'Sabit", "Timimoun", "Zaouiet Kounta"],
+            "Béni Abbès": ["Béni Abbès", "Béni Abbès", "Abadla", "Bechar", "Beni Ikhlef", "Beni Ounif", "El Ouata", "Igli", "Kenadsa", "Kerzaz", "Lahmar", "Mechraa Houari Boumediene", "Meridja", "Mogheul", "Ouled Khodeir", "Tabalbala", "Taghit", "Tamtert", "Timoudi"],
+            "Timimoun": ["Timimoun", "Timimoun", "Adrar", "Aougrout", "Aoulef", "Bordj Baji Mokhtar", "Charouine", "Fenoughil", "Reggane", "T'Sabit", "Zaouiet Kounta"],
+            "Touggourt": ["Touggourt", "Touggourt", "Ain Beida", "El Borma", "El Hadjira", "El Allia", "Gassi Touil", "Hassi Ben Abdellah", "Hassi Messaoud", "M'Gaid", "N'Goussa", "Ouargla", "Rouissat", "Sidi Khouiled", "Taibet", "Tebesbest", "Zaouia El Abidia"],
+            "Djanet": ["Djanet", "Djanet", "Bordj Omar Driss", "Debdeb", "Illizi", "In Amenas"],
+            "In Salah": ["In Salah", "In Salah", "Bordj Omar Driss", "Debdeb", "Illizi", "In Amenas"],
+            "In Guezzam": ["In Guezzam", "In Guezzam", "Bordj Omar Driss", "Debdeb", "Illizi", "In Amenas"]
+        };
+
+        // --- Demo Products (if empty) ---
+        if (products.length === 0) {
+            products = [
+                {
+                    id: 1,
+                    name: "Men's Classic Sneakers",
+                    description: "Comfortable and stylish sneakers perfect for everyday wear. Made with premium materials and cushioned sole for maximum comfort.",
+                    categories: ["Men", "Sports"],
+                    images: [
+                        "https://images.unsplash.com/photo-1517260911205-8a3b66e8a8b2?auto=format&fit=crop&w=400&q=80",
+                        "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=400&q=80",
+                        "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?auto=format&fit=crop&w=400&q=80"
+                    ],
+                    price: 15999,
+                    discount: 20,
+                    stockBySize: {
+                        "S": 5,
+                        "M": 8,
+                        "L": 10,
+                        "XL": 6,
+                        "XXL": 3
+                    },
+                    sizes: ["S", "M", "L", "XL", "XXL"]
+                },
+                {
+                    id: 2,
+                    name: "Women's Summer Dress",
+                    description: "Elegant summer dress with floral pattern. Lightweight fabric perfect for warm weather. Features adjustable straps and flattering cut.",
+                    categories: ["Women", "Fashion"],
+                    images: [
+                        "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80",
+                        "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=400&q=80",
+                        "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=400&q=80"
+                    ],
+                    price: 9999,
+                    discount: 10,
+                    stockBySize: {
+                        "S": 3,
+                        "M": 5,
+                        "L": 4,
+                        "XL": 2
+                    },
+                    sizes: ["S", "M", "L", "XL"]
+                },
+                {
+                    id: 3,
+                    name: "Children's Hoodie",
+                    description: "Warm and cozy hoodie for kids. Made with soft cotton blend, perfect for cool weather. Features kangaroo pocket and drawstring hood.",
+                    categories: ["Children", "Casual"],
+                    images: [
+                        "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=400&q=80",
+                        "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?auto=format&fit=crop&w=400&q=80"
+                    ],
+                    price: 5999,
+                    discount: 0,
+                    stockBySize: {
+                        "S": 8,
+                        "M": 10,
+                        "L": 6
+                    },
+                    sizes: ["S", "M", "L"]
+                },
+                {
+                    id: 4,
+                    name: "Men's Sport Jacket",
+                    description: "High-performance sport jacket with breathable fabric. Perfect for outdoor activities and sports. Features multiple pockets and adjustable fit.",
+                    categories: ["Men", "Sports", "Outdoor"],
+                    images: [
+                        "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80",
+                        "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=400&q=80",
+                        "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=400&q=80"
+                    ],
+                    price: 19999,
+                    discount: 25,
+                    stockBySize: {
+                        "M": 4,
+                        "L": 6,
+                        "XL": 3,
+                        "XXL": 2
+                    },
+                    sizes: ["M", "L", "XL", "XXL"]
+                },
+                {
+                    id: 5,
+                    name: "Women's Running Shoes",
+                    description: "Professional running shoes with advanced cushioning technology. Lightweight design with excellent support for long-distance running.",
+                    categories: ["Women", "Sports", "Fitness"],
+                    images: [
+                        "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80",
+                        "https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=400&q=80",
+                        "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?auto=format&fit=crop&w=400&q=80"
+                    ],
+                    price: 17999,
+                    discount: 15,
+                    stockBySize: {
+                        "S": 4,
+                        "M": 6,
+                        "L": 5,
+                        "XL": 3
+                    },
+                    sizes: ["S", "M", "L", "XL"]
+                }
+            ];
+            localStorage.setItem('products', JSON.stringify(products));
+        }
+
+        // --- Render Functions ---
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            let filtered = products.filter(p => 
+                (currentCategory === 'All' || (p.categories && p.categories.includes(currentCategory))) &&
+                (p.name.toLowerCase().includes(searchQuery.toLowerCase()))
+            );
+            grid.innerHTML = filtered.length === 0 ? 
+                `<div style="grid-column:1/-1;text-align:center;color:#888;">No products found.</div>` :
+                filtered.map(p => {
+                    // Get available sizes (sizes that have stock > 0)
+                    const availableSizesForProduct = (p.sizes || availableSizes).filter(size => {
+                        const stock = p.stockBySize ? p.stockBySize[size] : 0;
+                        return stock > 0;
+                    });
+                    
+                    const mainImage = p.images && p.images.length > 0 ? p.images[0] : '';
+                    
+                    return `
+                        <div class="product-card" onclick="openProductDetail(${p.id})" style="cursor: pointer;">
+                            <img src="${mainImage}" alt="${p.name}">
+                            <h4>${p.name}</h4>
+                            <div style="font-size: 0.9rem; color: var(--secondary); margin-bottom: 0.5rem;">
+                                ${p.categories ? p.categories.join(', ') : 'Uncategorized'}
+                            </div>
+                            <div>
+                                <span class="price">${(p.price * (1 - p.discount/100)).toLocaleString()} DZD</span>
+                                ${p.discount > 0 ? `<span class="old-price">${p.price.toLocaleString()} DZD</span>
+                                <span class="discount">-${p.discount}%</span>` : ''}
+                            </div>
+                            <div class="size-selector">
+                                <select id="size_${p.id}" onchange="onSizeChange(${p.id})" onclick="event.stopPropagation()">
+                                    ${availableSizesForProduct.map(size => `<option value="${size}">${size}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div class="quantity-controls">
+                                <button onclick="changeQuantity(${p.id}, -1); event.stopPropagation()">-</button>
+                                <input type="number" id="qty_${p.id}" value="1" min="1" max="3" onchange="updateQuantity(${p.id})" onclick="event.stopPropagation()">
+                                <button onclick="changeQuantity(${p.id}, 1); event.stopPropagation()">+</button>
+                            </div>
+                            <button onclick="addToShoppingHall(${p.id}); event.stopPropagation()" ${availableSizesForProduct.length === 0 ? 'disabled' : ''}>
+                                ${availableSizesForProduct.length === 0 ? 'Out of Stock' : 'Add to Hall'}
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+        }
+
+        function renderAdminProducts() {
+            const table = document.getElementById('adminProductsTable');
+            if (products.length === 0) {
+                table.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#888;">No products yet.</td></tr>`;
+                return;
+            }
+            table.innerHTML = `
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Discount</th>
+                    <th>Remove</th>
+                </tr>
+                ${products.map(p => `
+                    <tr>
+                        <td><img src="${p.image}" alt="${p.name}"></td>
+                        <td>${p.name}</td>
+                        <td>${p.category}</td>
+                        <td>$${p.price.toFixed(2)}</td>
+                        <td>${p.discount}%</td>
+                        <td><button onclick="removeProduct(${p.id})">Remove</button></td>
+                    </tr>
+                `).join('')}
+            `;
+        }
+
+        function renderShoppingHall() {
+            const table = document.getElementById('shoppingHallTable');
+            if (!currentUser || !shoppingHall[currentUser.username] || shoppingHall[currentUser.username].length === 0) {
+                table.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#888;">Your shopping hall is empty.</td></tr>`;
+                return;
+            }
+            let hallProducts = shoppingHall[currentUser.username]
+                .map(pid => products.find(p => p.id === pid))
+                .filter(Boolean);
+            if (hallProducts.length === 0) {
+                table.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#888;">Your shopping hall is empty.</td></tr>`;
+                return;
+            }
+            table.innerHTML = `
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Discount</th>
+                    <th>Remove</th>
+                </tr>
+                ${hallProducts.map(p => `
+                    <tr>
+                        <td><img src="${p.image}" alt="${p.name}"></td>
+                        <td>${p.name}</td>
+                        <td>$${(p.price * (1 - p.discount/100)).toFixed(2)}</td>
+                        <td>${p.discount}%</td>
+                        <td><button onclick="removeFromShoppingHall(${p.id})">Remove</button></td>
+                    </tr>
+                `).join('')}
+            `;
+        }
+
+        // --- Category & Search ---
+        function filterCategory(cat) {
+            currentCategory = cat;
+            renderSidebar();
+            renderNavigation();
+            renderProducts();
+        }
+        function showHome() {
+            filterCategory('All');
+        }
+        function searchProducts() {
+            searchQuery = document.getElementById('searchInput').value;
+            renderProducts();
+        }
+
+        // --- Admin Panel ---
+        function openAdminPanel() {
+            if (!currentUser || !currentUser.isAdmin) {
+                alert("Admin access only.");
+                return;
+            }
+            document.getElementById('adminPanel').classList.add('active');
+            renderAdminProducts();
+        }
+        function closeAdminPanel() {
+            document.getElementById('adminPanel').classList.remove('active');
+        }
+        function addProduct(e) {
+            e.preventDefault();
+            const name = document.getElementById('productName').value.trim();
+            const category = document.getElementById('productCategory').value;
+            const image = document.getElementById('productImage').value.trim();
+            const price = parseFloat(document.getElementById('productPrice').value);
+            const discount = parseInt(document.getElementById('productDiscount').value) || 0;
+            const id = Date.now();
+            products.push({ id, name, category, image, price, discount });
+            localStorage.setItem('products', JSON.stringify(products));
+            renderAdminProducts();
+            renderProducts();
+            document.getElementById('adminForm').reset();
+        }
+        function removeProduct(id) {
+            products = products.filter(p => p.id !== id);
+            // Remove from all shopping halls
+            Object.keys(shoppingHall).forEach(user => {
+                shoppingHall[user] = shoppingHall[user].filter(pid => pid !== id);
+            });
+            localStorage.setItem('products', JSON.stringify(products));
+            localStorage.setItem('shoppingHall', JSON.stringify(shoppingHall));
+            renderAdminProducts();
+            renderProducts();
+            if (document.getElementById('shoppingHall').classList.contains('active')) renderShoppingHall();
+        }
+
+        // --- Shopping Hall ---
+        function openShoppingHall() {
+            if (!currentUser) {
+                openAuthModal('login');
+                return;
+            }
+            document.getElementById('shoppingHall').classList.add('active');
+            renderShoppingHall();
+        }
+        function closeShoppingHall() {
+            document.getElementById('shoppingHall').classList.remove('active');
+        }
+        function addToShoppingHall(pid) {
+            if (!currentUser) {
+                openAuthModal('login');
+                return;
+            }
+            if (!shoppingHall[currentUser.username]) shoppingHall[currentUser.username] = [];
+            if (!shoppingHall[currentUser.username].includes(pid)) {
+                shoppingHall[currentUser.username].push(pid);
+                localStorage.setItem('shoppingHall', JSON.stringify(shoppingHall));
+                alert("Added to your shopping hall!");
+            } else {
+                alert("Already in your shopping hall.");
+            }
+        }
+        function removeFromShoppingHall(pid) {
+            if (!currentUser) return;
+            shoppingHall[currentUser.username] = shoppingHall[currentUser.username].filter(id => id !== pid);
+            localStorage.setItem('shoppingHall', JSON.stringify(shoppingHall));
+            renderShoppingHall();
+        }
+
+        // --- Auth Modal ---
+        let authMode = 'login';
+        function openAuthModal(mode) {
+            authMode = mode;
+            document.getElementById('authModal').classList.add('active');
+            document.getElementById('authTitle').textContent = mode === 'login' ? 'Login' : 'Sign Up';
+            document.getElementById('authSubmitBtn').textContent = mode === 'login' ? 'Login' : 'Sign Up';
+            document.querySelector('.auth-form .switch-link').textContent = 
+                mode === 'login' ? "Don't have an account? Sign Up" : "Already have an account? Login";
+            document.getElementById('authForm').reset();
+        }
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('active');
+        }
+        function switchAuthMode() {
+            openAuthModal(authMode === 'login' ? 'signup' : 'login');
+        }
+        function handleAuth(e) {
+            e.preventDefault();
+            const username = document.getElementById('authUsername').value.trim();
+            const password = document.getElementById('authPassword').value;
+            if (authMode === 'login') {
+                if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+                    currentUser = { username, isAdmin: true };
+                } else {
+                    const user = users.find(u => u.username === username && u.password === password);
+                    if (!user) {
+                        alert("Invalid credentials.");
+                        return;
+                    }
+                    currentUser = { username, isAdmin: false };
+                }
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                closeAuthModal();
+                updateUserUI();
+            } else {
+                if (username === ADMIN_CREDENTIALS.username) {
+                    alert("This username is reserved.");
+                    return;
+                }
+                if (users.find(u => u.username === username)) {
+                    alert("Username already exists.");
+                    return;
+                }
+                users.push({ username, password });
+                localStorage.setItem('users', JSON.stringify(users));
+                alert("Sign up successful! Please login.");
+                openAuthModal('login');
+            }
+        }
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateUserUI();
+        }
+        function updateUserUI() {
+            if (currentUser) {
+                document.getElementById('logoutBtn').style.display = '';
+                document.querySelector('.user-actions button[onclick*="openAuthModal"]').style.display = 'none';
+                if (currentUser.isAdmin) {
+                    document.getElementById('adminPanelBtn').style.display = '';
+                } else {
+                    document.getElementById('adminPanelBtn').style.display = 'none';
+                }
+            } else {
+                document.getElementById('logoutBtn').style.display = 'none';
+                document.querySelector('.user-actions button[onclick*="openAuthModal"]').style.display = '';
+                document.getElementById('adminPanelBtn').style.display = 'none';
+            }
+        }
+
+        // --- Quantity Controls ---
+        function changeQuantity(productId, change) {
+            const input = document.getElementById(`qty_${productId}`);
+            const newValue = Math.max(1, Math.min(parseInt(input.value) + change, input.max));
+            input.value = newValue;
+        }
+        
+        function onSizeChange(productId) {
+            updateQuantity(productId);
+        }
+        
+        function updateQuantity(productId) {
+            const input = document.getElementById(`qty_${productId}`);
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                const currentValue = parseInt(input.value) || 1;
+                const size = document.getElementById(`size_${productId}`).value;
+                
+                // Get stock for this specific size
+                const sizeStock = product.stockBySize ? product.stockBySize[size] : 0;
+                
+                // Calculate available stock (size stock minus what's already in shopping hall)
+                let currentInHall = 0;
+                if (currentUser && shoppingHall[currentUser.username]) {
+                    currentInHall = shoppingHall[currentUser.username]
+                        .filter(item => item.productId === productId && item.size === size)
+                        .reduce((sum, item) => sum + item.quantity, 0);
+                }
+                
+                const availableStock = Math.max(0, sizeStock - currentInHall);
+                // Limit to maximum of 3 per customer
+                const maxAllowed = Math.min(availableStock, 3);
+                input.max = maxAllowed;
+                input.value = Math.max(1, Math.min(currentValue, maxAllowed));
+            }
+        }
+        
+        // --- Tab Management ---
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(`${tabName}Tab`).classList.add('active');
+            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            
+            // Render specific content
+            if (tabName === 'orders') {
+                renderOrders();
+            } else if (tabName === 'categories') {
+                renderCategories();
+            } else if (tabName === 'sizes') {
+                renderSizes();
+            }
+        }
+        
+
+        
+        // --- Order Management ---
+        function renderOrders() {
+            const container = document.getElementById('ordersList');
+            if (orders.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #888;">No orders yet.</p>';
+                return;
+            }
+            
+            container.innerHTML = orders.map(order => {
+                const status = order.status || 'Pending';
+                const statusColor = status === 'Completed' ? 'var(--success)' : status === 'Cancelled' ? 'var(--danger)' : 'var(--accent)';
+                
+                return `
+                    <div style="border: 1px solid #eee; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h4>Order #${order.id}</h4>
+                            <span style="background: ${statusColor}; color: white; padding: 0.3rem 0.8rem; border-radius: 12px; font-size: 0.9rem;">
+                                ${status}
+                            </span>
+                        </div>
+                        <p><strong>Customer:</strong> ${order.customerName}</p>
+                        <p><strong>Phone:</strong> ${order.phone}</p>
+                        <p><strong>Email:</strong> ${order.email || 'Not provided'}</p>
+                        <p><strong>Address:</strong> ${order.address}, ${order.daira}, ${order.wilaya}</p>
+                        <p><strong>Date:</strong> ${new Date(order.date).toLocaleDateString()}</p>
+                        <p><strong>Total:</strong> ${order.total.toLocaleString()} DZD</p>
+                        <div style="margin-top: 1rem;">
+                            <h5>Items:</h5>
+                            ${order.items.map(item => `
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; background: #f8f9fa; margin: 0.5rem 0; border-radius: 4px;">
+                                    <div>
+                                        <strong>${item.name}</strong> (${item.size}) - Qty: ${item.quantity}
+                                    </div>
+                                    <div>${(item.price * (1 - item.discount/100) * item.quantity).toLocaleString()} DZD</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                            ${status === 'Pending' ? `
+                                <button onclick="updateOrderStatus(${order.id}, 'Completed')" style="background: var(--success); color: white; border: none; border-radius: 4px; padding: 0.5rem 1rem; cursor: pointer;">Mark as Done</button>
+                                <button onclick="updateOrderStatus(${order.id}, 'Cancelled')" style="background: var(--danger); color: white; border: none; border-radius: 4px; padding: 0.5rem 1rem; cursor: pointer;">Cancel Order</button>
+                            ` : ''}
+                            <button onclick="removeOrder(${order.id})" style="background: var(--danger); color: white; border: none; border-radius: 4px; padding: 0.5rem 1rem; cursor: pointer;">Remove Order</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function updateOrderStatus(orderId, status) {
+            const orderIndex = orders.findIndex(o => o.id === orderId);
+            if (orderIndex !== -1) {
+                orders[orderIndex].status = status;
+                localStorage.setItem('orders', JSON.stringify(orders));
+                renderOrders();
+            }
+        }
+        
+        function removeOrder(orderId) {
+            if (confirm('Are you sure you want to remove this order?')) {
+                orders = orders.filter(o => o.id !== orderId);
+                localStorage.setItem('orders', JSON.stringify(orders));
+                renderOrders();
+            }
+        }
+        
+        // --- Algerian Address System ---
+        function populateWilayas() {
+            const wilayaSelect = document.getElementById('orderWilaya');
+            wilayaSelect.innerHTML = '<option value="">Select Wilaya</option>';
+            Object.keys(ALGERIAN_WILAYAS).forEach(wilaya => {
+                wilayaSelect.innerHTML += `<option value="${wilaya}">${wilaya}</option>`;
+            });
+        }
+        
+        function updateDairas() {
+            const wilayaSelect = document.getElementById('orderWilaya');
+            const dairaSelect = document.getElementById('orderDaira');
+            const selectedWilaya = wilayaSelect.value;
+            
+            dairaSelect.innerHTML = '<option value="">Select Daira</option>';
+            if (selectedWilaya && ALGERIAN_WILAYAS[selectedWilaya]) {
+                ALGERIAN_WILAYAS[selectedWilaya].forEach(daira => {
+                    dairaSelect.innerHTML += `<option value="${daira}">${daira}</option>`;
+                });
+            }
+        }
+        
+        // --- Order Modal ---
+        function openOrderModal() {
+            if (!currentUser) {
+                openAuthModal('login');
+                return;
+            }
+            
+            const userHall = shoppingHall[currentUser.username] || [];
+            if (userHall.length === 0) {
+                alert('Your shopping hall is empty!');
+                return;
+            }
+            
+            populateWilayas();
+            updateOrderSummary();
+            document.getElementById('orderModal').classList.add('active');
+        }
+        
+        function closeOrderModal() {
+            document.getElementById('orderModal').classList.remove('active');
+        }
+        
+        function updateOrderSummary() {
+            const userHall = shoppingHall[currentUser.username] || [];
+            const summaryContent = document.getElementById('orderSummaryContent');
+            const subtotalSpan = document.getElementById('orderSubtotal');
+            const totalSpan = document.getElementById('orderTotal');
+            
+            let subtotal = 0;
+            let summaryHTML = '';
+            
+            userHall.forEach(item => {
+                const product = products.find(p => p.id === item.productId);
+                if (product) {
+                    const itemTotal = product.price * (1 - product.discount/100) * item.quantity;
+                    subtotal += itemTotal;
+                    summaryHTML += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #eee;">
+                            <div>
+                                <strong>${product.name}</strong> (${item.size})<br>
+                                <small>Qty: ${item.quantity} × ${(product.price * (1 - product.discount/100)).toLocaleString()} DZD</small>
+                            </div>
+                            <div>${itemTotal.toLocaleString()} DZD</div>
+                        </div>
+                    `;
+                }
+            });
+            
+            if (summaryContent) summaryContent.innerHTML = summaryHTML;
+            if (subtotalSpan) subtotalSpan.textContent = subtotal.toLocaleString();
+            if (totalSpan) totalSpan.textContent = (subtotal + 1000).toLocaleString();
+        }
+        
+        function placeOrder(e) {
+            e.preventDefault();
+            
+            const userHall = shoppingHall[currentUser.username] || [];
+            if (userHall.length === 0) {
+                alert('Your shopping hall is empty!');
+                return;
+            }
+            
+            // Check total order limit (max 3 orders per user)
+            const userOrders = orders.filter(order => order.username === currentUser.username);
+            if (userOrders.length >= 3) {
+                alert('You have reached the maximum limit of 3 orders. You cannot place more orders.');
+                return;
+            }
+            
+            // Validate stock
+            for (let item of userHall) {
+                const product = products.find(p => p.id === item.productId);
+                if (!product) {
+                    alert(`Product not found.`);
+                    return;
+                }
+                
+                const sizeStock = product.stockBySize ? product.stockBySize[item.size] : 0;
+                if (sizeStock < item.quantity) {
+                    alert(`Sorry, ${product.name} in size ${item.size} has insufficient stock. Available: ${sizeStock}`);
+                    return;
+                }
+            }
+            
+            // Check order limit (max 3 units per product per user)
+            const orderCounts = {};
+            orders.forEach(order => {
+                if (order.username === currentUser.username) {
+                    order.items.forEach(item => {
+                        orderCounts[item.productId] = (orderCounts[item.productId] || 0) + item.quantity;
+                    });
+                }
+            });
+            
+            for (let item of userHall) {
+                const currentTotal = (orderCounts[item.productId] || 0) + item.quantity;
+                if (currentTotal > 3) {
+                    const product = products.find(p => p.id === item.productId);
+                    alert(`You can only order up to 3 units of ${product ? product.name : 'this product'}.`);
+                    return;
+                }
+            }
+            
+            // Create order
+            const order = {
+                id: Date.now(),
+                username: currentUser.username,
+                customerName: document.getElementById('orderName').value,
+                phone: document.getElementById('orderPhone').value,
+                email: document.getElementById('orderEmail').value,
+                wilaya: document.getElementById('orderWilaya').value,
+                daira: document.getElementById('orderDaira').value,
+                address: document.getElementById('orderAddress').value,
+                date: new Date().toISOString(),
+                items: userHall.map(item => {
+                    const product = products.find(p => p.id === item.productId);
+                    return {
+                        productId: item.productId,
+                        name: product.name,
+                        size: item.size,
+                        quantity: item.quantity,
+                        price: product.price,
+                        discount: product.discount
+                    };
+                }),
+                subtotal: parseInt(document.getElementById('orderSubtotal').textContent.replace(/,/g, '')),
+                delivery: 1000,
+                total: parseInt(document.getElementById('orderTotal').textContent.replace(/,/g, ''))
+            };
+            
+            // Update stock
+            userHall.forEach(item => {
+                const product = products.find(p => p.id === item.productId);
+                if (product && product.stockBySize) {
+                    if (product.stockBySize[item.size]) {
+                        product.stockBySize[item.size] -= item.quantity;
+                    }
+                }
+            });
+            
+            // Save data
+            orders.push(order);
+            shoppingHall[currentUser.username] = [];
+            localStorage.setItem('orders', JSON.stringify(orders));
+            localStorage.setItem('shoppingHall', JSON.stringify(shoppingHall));
+            localStorage.setItem('products', JSON.stringify(products));
+            
+            // Close modal and show success
+            closeOrderModal();
+            alert('Order placed successfully! Thank you for your purchase.');
+            
+            // Update displays
+            renderProducts();
+            renderShoppingHall();
+            if (document.getElementById('adminPanel').classList.contains('active')) {
+                renderAdminProducts();
+            }
+        }
+        
+        // --- Updated Shopping Hall Functions ---
+        function addToShoppingHall(productId) {
+            if (!currentUser) {
+                openAuthModal('login');
+                return;
+            }
+            
+            const quantity = parseInt(document.getElementById(`qty_${productId}`).value);
+            const size = document.getElementById(`size_${productId}`).value;
+            const product = products.find(p => p.id === productId);
+            
+            if (!product) return;
+            
+            if (!shoppingHall[currentUser.username]) {
+                shoppingHall[currentUser.username] = [];
+            }
+            
+            // Get stock for this specific size
+            const sizeStock = product.stockBySize ? product.stockBySize[size] : 0;
+            
+            // Calculate current quantity in shopping hall for this product and size
+            const currentInHall = shoppingHall[currentUser.username]
+                .filter(item => item.productId === productId && item.size === size)
+                .reduce((sum, item) => sum + item.quantity, 0);
+            
+            const availableStock = sizeStock - currentInHall;
+            
+            if (availableStock < quantity) {
+                alert(`Sorry, only ${availableStock} units available in size ${size}.`);
+                return;
+            }
+            
+            // Check if adding this quantity would exceed the 3-unit limit
+            const newTotalQuantity = currentInHall + quantity;
+            if (newTotalQuantity > 3) {
+                alert(`Sorry, you can only order up to 3 units of this product in size ${size}. You already have ${currentInHall} in your cart.`);
+                return;
+            }
+            
+            // Check if product already exists in hall
+            const existingIndex = shoppingHall[currentUser.username].findIndex(item => 
+                item.productId === productId && item.size === size
+            );
+            
+            if (existingIndex !== -1) {
+                shoppingHall[currentUser.username][existingIndex].quantity += quantity;
+            } else {
+                shoppingHall[currentUser.username].push({ productId, quantity, size });
+            }
+            
+            localStorage.setItem('shoppingHall', JSON.stringify(shoppingHall));
+            alert("Added to your shopping hall!");
+        }
+        
+        function removeFromShoppingHall(productId, size) {
+            if (!currentUser) return;
+            shoppingHall[currentUser.username] = shoppingHall[currentUser.username].filter(item => 
+                !(item.productId === productId && item.size === size)
+            );
+            localStorage.setItem('shoppingHall', JSON.stringify(shoppingHall));
+            renderShoppingHall();
+        }
+        
+        function updateShoppingHallQuantity(productId, size, change) {
+            if (!currentUser) return;
+            const item = shoppingHall[currentUser.username].find(item => 
+                item.productId === productId && item.size === size
+            );
+            if (item) {
+                const newQuantity = item.quantity + change;
+                if (newQuantity <= 0) {
+                    removeFromShoppingHall(productId, size);
+                } else {
+                    const product = products.find(p => p.id === productId);
+                    if (product) {
+                        // Get stock for this specific size
+                        const sizeStock = product.stockBySize ? product.stockBySize[size] : 0;
+                        
+                        // Calculate available stock (size stock minus what's already in shopping hall)
+                        const currentInHall = shoppingHall[currentUser.username]
+                            .filter(hallItem => hallItem.productId === productId && hallItem.size === size)
+                            .reduce((sum, hallItem) => sum + hallItem.quantity, 0);
+                        
+                        const availableStock = sizeStock - currentInHall + item.quantity;
+                        // Limit to maximum of 3 per customer
+                        const maxAllowed = Math.min(availableStock, 3);
+                        
+                        if (newQuantity <= maxAllowed) {
+                            item.quantity = newQuantity;
+                            localStorage.setItem('shoppingHall', JSON.stringify(shoppingHall));
+                            renderShoppingHall();
+                        } else {
+                            alert(`Sorry, you can only order up to 3 units of this product in size ${size}.`);
+                        }
+                    }
+                }
+            }
+        }
+        
+        // --- Updated Render Functions ---
+        function renderShoppingHall() {
+            const table = document.getElementById('shoppingHallTable');
+            if (!currentUser || !shoppingHall[currentUser.username] || shoppingHall[currentUser.username].length === 0) {
+                table.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#888;">Your shopping hall is empty.</td></tr>`;
+                return;
+            }
+            
+            let hallItems = shoppingHall[currentUser.username]
+                .map(item => {
+                    const product = products.find(p => p.id === item.productId);
+                    return product ? { ...item, product } : null;
+                })
+                .filter(Boolean);
+            
+            if (hallItems.length === 0) {
+                table.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#888;">Your shopping hall is empty.</td></tr>`;
+                return;
+            }
+            
+            table.innerHTML = `
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Size</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                </tr>
+                ${hallItems.map(item => `
+                    <tr>
+                        <td><img src="${item.product.images && item.product.images.length > 0 ? item.product.images[0] : item.product.image || ''}" alt="${item.product.name}"></td>
+                        <td>${item.product.name}</td>
+                        <td>${item.size}</td>
+                        <td>
+                            <div class="quantity-controls">
+                                <button onclick="updateShoppingHallQuantity(${item.productId}, '${item.size}', -1)">-</button>
+                                <span>${item.quantity}</span>
+                                <button onclick="updateShoppingHallQuantity(${item.productId}, '${item.size}', 1)">+</button>
+                            </div>
+                        </td>
+                        <td>${(item.product.price * (1 - item.product.discount/100) * item.quantity).toLocaleString()} DZD</td>
+                        <td><button onclick="removeFromShoppingHall(${item.productId}, '${item.size}')">Remove</button></td>
+                    </tr>
+                `).join('')}
+            `;
+        }
+        
+        function renderAdminProducts() {
+            const table = document.getElementById('adminProductsTable');
+            if (products.length === 0) {
+                table.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#888;">No products yet.</td></tr>`;
+                return;
+            }
+            table.innerHTML = `
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Categories</th>
+                    <th>Price</th>
+                    <th>Discount</th>
+                    <th>Stock by Size</th>
+                    <th>Edit</th>
+                    <th>Remove</th>
+                </tr>
+                ${products.map(p => {
+                    const stockBySize = p.stockBySize ? Object.entries(p.stockBySize).map(([size, stock]) => `${size}:${stock}`).join(', ') : 'No stock';
+                    return `
+                        <tr>
+                            <td><img src="${p.images && p.images.length > 0 ? p.images[0] : p.image || ''}" alt="${p.name}"></td>
+                            <td>${p.name}</td>
+                            <td>${p.categories ? p.categories.join(', ') : 'Uncategorized'}</td>
+                            <td>${p.price.toLocaleString()} DZD</td>
+                            <td>${p.discount}%</td>
+                            <td>${stockBySize}</td>
+                            <td><button onclick="editProduct(${p.id})" style="background: var(--accent); color: white; border: none; border-radius: 4px; padding: 0.2rem 0.5rem; cursor: pointer;">Edit</button></td>
+                            <td><button onclick="removeProduct(${p.id})">Remove</button></td>
+                        </tr>
+                    `;
+                }).join('')}
+            `;
+        }
+        
+        // --- Product Detail Functions ---
+        let currentDetailProduct = null;
+        
+        function openProductDetail(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            
+            currentDetailProduct = product;
+            
+            // Set product info
+            document.getElementById('productDetailName').textContent = product.name;
+            document.getElementById('productDetailCategories').textContent = product.categories ? product.categories.join(', ') : 'Uncategorized';
+            document.getElementById('productDetailDescription').textContent = product.description || 'No description available.';
+            
+            // Set price
+            const discountedPrice = product.price * (1 - product.discount/100);
+            let priceHTML = `<span class="price" style="font-size: 1.5rem;">${discountedPrice.toLocaleString()} DZD</span>`;
+            if (product.discount > 0) {
+                priceHTML += `<span class="old-price" style="margin-left: 0.5rem;">${product.price.toLocaleString()} DZD</span>
+                <span class="discount" style="margin-left: 0.5rem;">-${product.discount}%</span>`;
+            }
+            document.getElementById('productDetailPrice').innerHTML = priceHTML;
+            
+            // Set images
+            const images = product.images && product.images.length > 0 ? product.images : [product.image || ''];
+            const mainImage = document.getElementById('productMainImage');
+            const thumbnailsContainer = document.getElementById('productThumbnails');
+            
+            mainImage.src = images[0];
+            mainImage.alt = product.name;
+            
+            thumbnailsContainer.innerHTML = images.map((img, index) => `
+                <img src="${img}" alt="${product.name} - Image ${index + 1}" class="product-thumbnail ${index === 0 ? 'active' : ''}" 
+                     onclick="changeProductImage(${index})" title="Image ${index + 1}">
+            `).join('');
+            
+            // Set sizes
+            const availableSizesForProduct = (product.sizes || availableSizes).filter(size => {
+                const stock = product.stockBySize ? product.stockBySize[size] : 0;
+                return stock > 0;
+            });
+            
+            const sizeSelect = document.getElementById('detailSize');
+            sizeSelect.innerHTML = availableSizesForProduct.map(size => `<option value="${size}">${size}</option>`).join('');
+            
+            // Reset quantity
+            document.getElementById('detailQty').value = 1;
+            
+            // Update add button
+            const addBtn = document.getElementById('detailAddBtn');
+            if (availableSizesForProduct.length === 0) {
+                addBtn.textContent = 'Out of Stock';
+                addBtn.disabled = true;
+            } else {
+                addBtn.textContent = 'Add to Hall';
+                addBtn.disabled = false;
+            }
+            
+            document.getElementById('productDetailModal').classList.add('active');
+        }
+        
+        function closeProductDetail() {
+            document.getElementById('productDetailModal').classList.remove('active');
+            currentDetailProduct = null;
+        }
+        
+        function changeProductImage(index) {
+            if (!currentDetailProduct || !currentDetailProduct.images) return;
+            
+            const images = currentDetailProduct.images;
+            if (index >= 0 && index < images.length) {
+                document.getElementById('productMainImage').src = images[index];
+                
+                // Update active thumbnail
+                document.querySelectorAll('.product-thumbnail').forEach((thumb, i) => {
+                    thumb.classList.toggle('active', i === index);
+                });
+            }
+        }
+        
+        function onDetailSizeChange() {
+            updateDetailQuantity();
+        }
+        
+        function changeDetailQuantity(change) {
+            const input = document.getElementById('detailQty');
+            const newValue = Math.max(1, Math.min(parseInt(input.value) + change, input.max));
+            input.value = newValue;
+        }
+        
+        function updateDetailQuantity() {
+            if (!currentDetailProduct) return;
+            
+            const input = document.getElementById('detailQty');
+            const size = document.getElementById('detailSize').value;
+            const currentValue = parseInt(input.value) || 1;
+            
+            // Get stock for this specific size
+            const sizeStock = currentDetailProduct.stockBySize ? currentDetailProduct.stockBySize[size] : 0;
+            
+            // Calculate available stock (size stock minus what's already in shopping hall)
+            let currentInHall = 0;
+            if (currentUser && shoppingHall[currentUser.username]) {
+                currentInHall = shoppingHall[currentUser.username]
+                    .filter(item => item.productId === currentDetailProduct.id && item.size === size)
+                    .reduce((sum, item) => sum + item.quantity, 0);
+            }
+            
+            const availableStock = Math.max(0, sizeStock - currentInHall);
+            // Limit to maximum of 3 per customer
+            const maxAllowed = Math.min(availableStock, 3);
+            input.max = maxAllowed;
+            input.value = Math.max(1, Math.min(currentValue, maxAllowed));
+        }
+        
+        function addToShoppingHallFromDetail() {
+            if (!currentDetailProduct || !currentUser) {
+                openAuthModal('login');
+                return;
+            }
+            
+            const quantity = parseInt(document.getElementById('detailQty').value);
+            const size = document.getElementById('detailSize').value;
+            
+            if (!shoppingHall[currentUser.username]) {
+                shoppingHall[currentUser.username] = [];
+            }
+            
+            // Get stock for this specific size
+            const sizeStock = currentDetailProduct.stockBySize ? currentDetailProduct.stockBySize[size] : 0;
+            
+            // Calculate current quantity in shopping hall for this product and size
+            const currentInHall = shoppingHall[currentUser.username]
+                .filter(item => item.productId === currentDetailProduct.id && item.size === size)
+                .reduce((sum, item) => sum + item.quantity, 0);
+            
+            const availableStock = sizeStock - currentInHall;
+            
+            if (availableStock < quantity) {
+                alert(`Sorry, only ${availableStock} units available in size ${size}.`);
+                return;
+            }
+            
+            // Check if adding this quantity would exceed the 3-unit limit
+            const newTotalQuantity = currentInHall + quantity;
+            if (newTotalQuantity > 3) {
+                alert(`Sorry, you can only order up to 3 units of this product in size ${size}. You already have ${currentInHall} in your cart.`);
+                return;
+            }
+            
+            // Check if product already exists in hall
+            const existingIndex = shoppingHall[currentUser.username].findIndex(item => 
+                item.productId === currentDetailProduct.id && item.size === size
+            );
+            
+            if (existingIndex !== -1) {
+                shoppingHall[currentUser.username][existingIndex].quantity += quantity;
+            } else {
+                shoppingHall[currentUser.username].push({ productId: currentDetailProduct.id, quantity, size });
+            }
+            
+            localStorage.setItem('shoppingHall', JSON.stringify(shoppingHall));
+            alert("Added to your shopping hall!");
+            closeProductDetail();
+        }
+        
+        // --- Product Management Functions ---
+        let editingProductId = null;
+        
+        function addProduct(e) {
+            e.preventDefault();
+            const name = document.getElementById('productName').value.trim();
+            const description = document.getElementById('productDescription').value.trim();
+            const imagesText = document.getElementById('productImages').value.trim();
+            const price = parseInt(document.getElementById('productPrice').value);
+            const discount = parseInt(document.getElementById('productDiscount').value) || 0;
+            
+            // Parse images (split by newlines and filter empty lines)
+            const images = imagesText.split('\n').map(url => url.trim()).filter(url => url.length > 0);
+            
+            // Get selected categories from checkboxes
+            const categories = Array.from(document.querySelectorAll('#categoryCheckboxes input:checked')).map(cb => cb.value);
+            
+            // Get selected sizes and their stock quantities
+            const stockBySize = {};
+            const sizes = [];
+            availableSizes.forEach(size => {
+                const checkbox = document.getElementById(`size_${size}`);
+                const stockInput = document.getElementById(`stock_${size}`);
+                if (checkbox && checkbox.checked) {
+                    const stock = parseInt(stockInput.value) || 0;
+                    if (stock > 0) {
+                        stockBySize[size] = stock;
+                        sizes.push(size);
+                    }
+                }
+            });
+            
+            if (categories.length === 0) {
+                alert('Please select at least one category.');
+                return;
+            }
+            
+            if (images.length === 0) {
+                alert('Please enter at least one image URL.');
+                return;
+            }
+            
+            if (sizes.length === 0) {
+                alert('Please select at least one size with stock quantity.');
+                return;
+            }
+            
+            if (editingProductId) {
+                // Update existing product
+                const productIndex = products.findIndex(p => p.id === editingProductId);
+                if (productIndex !== -1) {
+                    products[productIndex] = {
+                        ...products[productIndex],
+                        name, description, categories, images, price, discount, stockBySize, sizes
+                    };
+                }
+                editingProductId = null;
+                document.getElementById('addProductBtn').textContent = 'Add Product';
+                document.getElementById('cancelEditBtn').style.display = 'none';
+            } else {
+                // Add new product
+                const id = Date.now();
+                products.push({ id, name, description, categories, images, price, discount, stockBySize, sizes });
+            }
+            
+            localStorage.setItem('products', JSON.stringify(products));
+            renderAdminProducts();
+            renderProducts();
+            document.getElementById('adminForm').reset();
+            renderProductForm(); // Re-render the form to reset checkboxes
+        }
+        
+        function editProduct(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            
+            editingProductId = productId;
+            document.getElementById('productName').value = product.name;
+            document.getElementById('productDescription').value = product.description || '';
+            document.getElementById('productImages').value = (product.images || [product.image || '']).join('\n');
+            document.getElementById('productPrice').value = product.price;
+            document.getElementById('productDiscount').value = product.discount;
+            
+            // Set category checkboxes
+            categories.forEach(cat => {
+                const checkbox = document.getElementById(`cat_${cat}`);
+                if (checkbox) {
+                    checkbox.checked = (product.categories || []).includes(cat);
+                }
+            });
+            
+            // Set size checkboxes and stock inputs
+            availableSizes.forEach(size => {
+                const checkbox = document.getElementById(`size_${size}`);
+                const stockInput = document.getElementById(`stock_${size}`);
+                if (checkbox) {
+                    checkbox.checked = (product.sizes || []).includes(size);
+                }
+                if (stockInput) {
+                    stockInput.value = product.stockBySize ? product.stockBySize[size] || 0 : 0;
+                }
+            });
+            
+            document.getElementById('addProductBtn').textContent = 'Update Product';
+            document.getElementById('cancelEditBtn').style.display = 'inline-block';
+        }
+        
+        function cancelEdit() {
+            editingProductId = null;
+            document.getElementById('addProductBtn').textContent = 'Add Product';
+            document.getElementById('cancelEditBtn').style.display = 'none';
+            document.getElementById('adminForm').reset();
+        }
+        
+        // --- Category Management ---
+        function addCategory() {
+            const newCategory = document.getElementById('newCategory').value.trim();
+            if (!newCategory) {
+                alert('Please enter a category name.');
+                return;
+            }
+            
+            if (categories.includes(newCategory)) {
+                alert('Category already exists.');
+                return;
+            }
+            
+            categories.push(newCategory);
+            localStorage.setItem('categories', JSON.stringify(categories));
+            document.getElementById('newCategory').value = '';
+            renderCategories();
+            renderSidebar();
+            renderNavigation();
+            renderProductForm(); // Update product form category dropdown
+        }
+        
+        function removeCategory(categoryName) {
+            if (categoryName === 'Men' || categoryName === 'Women' || categoryName === 'Children') {
+                alert('Cannot remove default categories.');
+                return;
+            }
+            
+            if (products.some(p => p.category === categoryName)) {
+                alert('Cannot remove category that has products. Please move or delete products first.');
+                return;
+            }
+            
+            categories = categories.filter(cat => cat !== categoryName);
+            localStorage.setItem('categories', JSON.stringify(categories));
+            renderCategories();
+            renderSidebar();
+            renderNavigation();
+            renderProductForm(); // Update product form category dropdown
+        }
+        
+        function renderCategories() {
+            const container = document.getElementById('categoriesList');
+            container.innerHTML = categories.map(cat => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; border: 1px solid #eee; margin: 0.5rem 0; border-radius: 4px;">
+                    <span>${cat}</span>
+                    ${cat === 'Men' || cat === 'Women' || cat === 'Children' ? 
+                        '<span style="color: #888; font-size: 0.9rem;">Default</span>' : 
+                        `<button onclick="removeCategory('${cat}')" style="background: var(--danger); color: white; border: none; border-radius: 4px; padding: 0.2rem 0.5rem; cursor: pointer;">Remove</button>`
+                    }
+                </div>
+            `).join('');
+        }
+        
+        // --- Size Management ---
+        function addSize() {
+            const newSize = document.getElementById('newSize').value.trim();
+            if (!newSize) {
+                alert('Please enter a size name.');
+                return;
+            }
+            
+            if (availableSizes.includes(newSize)) {
+                alert('Size already exists.');
+                return;
+            }
+            
+            availableSizes.push(newSize);
+            localStorage.setItem('availableSizes', JSON.stringify(availableSizes));
+            document.getElementById('newSize').value = ''; // Clear the input
+            renderSizes();
+            renderProductForm();
+            renderProducts(); // Update product cards to show new sizes
+        }
+        
+        function removeSize(size) {
+            if (size === 'S' || size === 'M' || size === 'L' || size === 'XL' || size === 'XXL' || size === 'XXXL') {
+                alert('Cannot remove default sizes.');
+                return;
+            }
+            
+            availableSizes = availableSizes.filter(s => s !== size);
+            localStorage.setItem('availableSizes', JSON.stringify(availableSizes));
+            renderSizes();
+            renderProductForm();
+            renderProducts(); // Update product cards to reflect removed sizes
+        }
+        
+        function renderSizes() {
+            const container = document.getElementById('sizesList');
+            container.innerHTML = availableSizes.map(size => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; border: 1px solid #eee; margin: 0.5rem 0; border-radius: 4px;">
+                    <span>${size}</span>
+                    ${['S', 'M', 'L', 'XL', 'XXL', 'XXXL'].includes(size) ? 
+                        '<span style="color: #888; font-size: 0.9rem;">Default</span>' : 
+                        `<button onclick="removeSize('${size}')" style="background: var(--danger); color: white; border: none; border-radius: 4px; padding: 0.2rem 0.5rem; cursor: pointer;">Remove</button>`
+                    }
+                </div>
+            `).join('');
+        }
+        
+        // --- Render Functions for Dynamic Content ---
+        function renderSidebar() {
+            const sidebar = document.getElementById('sidebarCategories');
+            if (sidebar) {
+                sidebar.innerHTML = `
+                    <li><a href="#" onclick="filterCategory('All')" class="${currentCategory === 'All' ? 'active' : ''}">All</a></li>
+                    ${categories.map(cat => `<li><a href="#" onclick="filterCategory('${cat}')" class="${currentCategory === cat ? 'active' : ''}">${cat}</a></li>`).join('')}
+                `;
+            }
+        }
+        
+        function renderNavigation() {
+            const nav = document.getElementById('mainNavigation');
+            if (nav) {
+                nav.innerHTML = `
+                    <a href="#" class="nav-home ${currentCategory === 'All' ? 'active' : ''}" onclick="showHome()">Home</a>
+                    ${categories.map(cat => `<a href="#" class="nav-${cat.toLowerCase()} ${currentCategory === cat ? 'active' : ''}" onclick="filterCategory('${cat}')">${cat}</a>`).join('')}
+                `;
+            }
+        }
+        
+        function renderProductForm() {
+            // Update the category checkboxes
+            const categoryContainer = document.getElementById('categoryCheckboxes');
+            if (categoryContainer) {
+                categoryContainer.innerHTML = categories.map(cat => `
+                    <label style="display: flex; align-items: center; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+                        <input type="checkbox" value="${cat}" id="cat_${cat}" style="margin-right: 0.5rem;">
+                        ${cat}
+                    </label>
+                `).join('');
+            }
+            
+            // Update the sizes and stock container
+            const sizeStockContainer = document.getElementById('sizeStockContainer');
+            if (sizeStockContainer) {
+                sizeStockContainer.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                        ${availableSizes.map(size => `
+                            <div style="border: 1px solid #ddd; border-radius: 8px; padding: 1rem;">
+                                <label style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+                                    <input type="checkbox" value="${size}" id="size_${size}" style="margin-right: 0.5rem;">
+                                    <strong>${size}</strong>
+                                </label>
+                                <input type="number" id="stock_${size}" placeholder="Stock" min="0" value="0" 
+                                       style="width: 100%; padding: 0.3rem; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+        }
+        
+        // --- Initialize Data ---
+        function initializeData() {
+            // Ensure categories and sizes are properly loaded
+            if (!Array.isArray(categories)) {
+                categories = ["Men", "Women", "Children", "Sports", "Fashion", "Casual", "Outdoor", "Fitness"];
+                localStorage.setItem('categories', JSON.stringify(categories));
+            }
+            
+            if (!Array.isArray(availableSizes)) {
+                availableSizes = ["S", "M", "L", "XL", "XXL", "XXXL"];
+                localStorage.setItem('availableSizes', JSON.stringify(availableSizes));
+            }
+            
+            // Migrate old products to new structure
+            products.forEach(product => {
+                // Migrate from single category to categories array
+                if (product.category && !product.categories) {
+                    product.categories = [product.category];
+                    delete product.category;
+                }
+                
+                // Migrate from single stock to stockBySize
+                if (product.stock && !product.stockBySize) {
+                    product.stockBySize = {};
+                    if (product.sizes && Array.isArray(product.sizes)) {
+                        product.sizes.forEach(size => {
+                            product.stockBySize[size] = product.stock;
+                        });
+                    }
+                    delete product.stock;
+                }
+                
+                // Ensure products have sizes
+                if (!product.sizes || !Array.isArray(product.sizes)) {
+                    product.sizes = availableSizes;
+                }
+            });
+            localStorage.setItem('products', JSON.stringify(products));
+        }
+        
+        // --- Initial Render ---
+        function initializeApp() {
+            initializeData();
+            renderProducts();
+            updateUserUI();
+            renderCategories();
+            renderSizes();
+            renderSidebar();
+            renderNavigation();
+            renderProductForm();
+        }
+        
+        // Wait for DOM to be ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
+
+        // --- Close modals on outside click ---
+        document.querySelectorAll('.admin-panel, .shopping-hall, .auth-modal, .order-modal, .product-detail-modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) modal.classList.remove('active');
+            });
+        });
+
+        // --- Keyboard shortcuts for demo ---
+        document.addEventListener('keydown', function(e) {
+            if (e.key === "Escape") {
+                closeAdminPanel();
+                closeShoppingHall();
+                closeAuthModal();
+                closeOrderModal();
+                closeProductDetail();
+            }
+        });
+    </script>
+    <!-- 
+    To host this site for free, you can copy this code to https://codesandbox.io/ or https://vercel.com/new or https://netlify.com/ or https://glitch.com/
+    For a quick preview, paste it into https://jsfiddle.net/ or https://codepen.io/ 
+    -->
+    <div style="display:none;">
+        <!-- Demo hosting link: https://ecommerce-shopease-demo.vercel.app/ -->
+    </div>
+</body>
+</html>
+
